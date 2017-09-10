@@ -1,13 +1,11 @@
 ---
-title: 软工作业-2（Sudoku)
+title: 第二次作业——个人项目实战（Sudoku)
 date: 2017-09-09 19:39:36
 tags:
   - Algorithm
   - HomeWork
 categories: 随笔
 ---
-
-# 第二次作业——个人项目实战（Sudoku)
 
 [Github:Sudoku](https://github.com/chs97/Sudoku)
 
@@ -28,6 +26,8 @@ categories: 随笔
 ```
 sudoku.exe -c 1
 ```
+
+<!--more-->
 
 **输出示例**
 
