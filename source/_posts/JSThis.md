@@ -6,7 +6,7 @@ tags:
 categories: 前端
 ---
 
-### this的四种调用方式
+### this 的四种调用方式
 
 #### 一、方法调用模式
 
@@ -15,13 +15,15 @@ categories: 前端
 ```javascript
 var val = 'outer'
 var methodCall = {
-    val: 'inner',
-    printVal: function(){
-        console.log(this.val)
-    }
+  val: 'inner',
+  printVal: function() {
+    console.log(this.val)
+  }
 }
-methodCall.printVal()  //"inner"
+methodCall.printVal() //"inner"
 ```
+
+<!--more-->
 
 #### 二、构造器调用模式
 
@@ -29,24 +31,23 @@ methodCall.printVal()  //"inner"
 
 ```javascript
 var val = 'outer'
-function methodCall(){
-    this.val = 'inner'
+function methodCall() {
+  this.val = 'inner'
 }
 methodCall.prototype = {
-    printVal: function(){
-        console.log(this.val)
-    }
+  printVal: function() {
+    console.log(this.val)
+  }
 }
 var a = new methodCall()
-a.printVal()   //"inner"
+a.printVal() //"inner"
 ```
-<!--more-->
 
 #### 三、函数调用模式
 
 `函数未作为对象的属性时，其当作一个正常函数来调用，此时this被绑定至全局对象。`
 
-> 注意：在严格模式下，此时的this为undefined
+> 注意：在严格模式下，此时的 this 为 undefined
 
 ```javascript
 var val = 'outer'
@@ -82,7 +83,7 @@ var obj = {
 }
 obj.a()
 结果为：
-Object 
+Object
 Window
 ```
 
@@ -99,7 +100,7 @@ var obj = {
 }
 obj.a()
 结果为：
-Object 
+Object
 Window
 ```
 
@@ -127,13 +128,13 @@ outer
 outer
 ```
 
-----
+---
 
 ##### 1.apply [Function.prototype.apply()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/apply)
 
 > fun.apply(thisArg[, argsArray])
 >
-> thisArg:在 *fun* 函数运行时指定的 `this` `值。
+> thisArg:在 _fun_ 函数运行时指定的 `this` `值。
 >
 > argsArray:一个数组或者类数组对象，其中的数组元素将作为单独的参数传给 `fun` 函数。
 
@@ -218,45 +219,44 @@ outer
 
 ### this 的应用
 
-#### 一、js的链式方法
+#### 一、js 的链式方法
 
-> 实现fn.set(number).get() 输出为 number
+> 实现 fn.set(number).get() 输出为 number
 
 ```javascript
-function obj () {
+function obj() {
   var val = 0
-  this.set = function (val) {
+  this.set = function(val) {
     this.val = val
     return this
   }
-  this.get = function () {
+  this.get = function() {
     return this.val
   }
 }
 var fn = new obj()
-fn.set(20).get()
->20
+fn.set(20).get() > 20
 ```
 
 #### 二、柯里化
 
-> 实现add(1)(2)() = 3  add(1, 2, 3,4)() = 10
+> 实现 add(1)(2)() = 3 add(1, 2, 3,4)() = 10
 >
 > 原理： 将所有参数都丢到一起后相加
 
 ```javascript
-function add () {
-	let oldArr = [].slice.call(arguments)
-	let _self = this
-	return function () {
-		let arr = [].slice.call(arguments)
-		let newArr = arr.concat(oldArr)
-		if (!arr.length) {
-			return newArr.reduce((acc, val) => (acc + val), 0)
-		} else {
-			return add.apply(_self, newArr)
-		}
-	}
+function add() {
+  let oldArr = [].slice.call(arguments)
+  let _self = this
+  return function() {
+    let arr = [].slice.call(arguments)
+    let newArr = arr.concat(oldArr)
+    if (!arr.length) {
+      return newArr.reduce((acc, val) => acc + val, 0)
+    } else {
+      return add.apply(_self, newArr)
+    }
+  }
 }
 let x = add(1, 2, 3)(4)(5)()
 console.log(x)
@@ -267,19 +267,15 @@ console.log(x)
 ```javascript
 朋神优雅的写法
 
-function adder (...arg) {
-    return function (...inarg) {
-        return inarg.length === 0
-            ? arg.reduce((a,b) => a+b, 0)
-            : adder.apply(this, [...arg, ...inarg])
-    }
+function adder(...arg) {
+  return function(...inarg) {
+    return inarg.length === 0 ? arg.reduce((a, b) => a + b, 0) : adder.apply(this, [...arg, ...inarg])
+  }
 }
 ```
 
-
-
 参考：
 
-[this与JavaScript中的四种调用模式](http://miaoyunze.com/2016/09/24/this-in-js/)
+[this 与 JavaScript 中的四种调用模式](http://miaoyunze.com/2016/09/24/this-in-js/)
 
-[掌握JavaScript函数的柯里化](https://github.com/dreamapplehappy/hacking-with-javascript/blob/master/books/javascript-the-good-parts/chapter-4-function/currying.md)
+[掌握 JavaScript 函数的柯里化](https://github.com/dreamapplehappy/hacking-with-javascript/blob/master/books/javascript-the-good-parts/chapter-4-function/currying.md)

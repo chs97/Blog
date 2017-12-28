@@ -8,7 +8,7 @@ tags:
 categories: 前端
 ---
 
-# 使用daocloud和docker实现vue的持续集成
+# 使用 daocloud 和 docker 实现 vue 的持续集成
 
 ---
 
@@ -18,20 +18,22 @@ categories: 前端
 
 Dockerfile 是一个文本文件，其内包含了一条条的**指令(Instruction)**，每一条指令构建一层，因此每一条指令的内容，就是描述该层应当如何构建。
 
-而 `FROM` 就是指定**基础镜像**，因此一个 `Dockerfile` 中 `FROM` 是必备的指令，并且必须是第一条指令。
+而  `FROM`  就是指定**基础镜像**，因此一个  `Dockerfile`  中  `FROM`  是必备的指令，并且必须是第一条指令。
 
-Dockerfile中的每一条指令都是一个layer，docker build的过程中会缓存layer，所以就存在可优化的地方。
+Dockerfile 中的每一条指令都是一个 layer，docker build 的过程中会缓存 layer，所以就存在可优化的地方。
+
+<!--more-->
 
 ## 二、持续集成
 
-push代码到远程分支，自动测试 自动构建 自动发布。
+push 代码到远程分支，自动测试 自动构建 自动发布。
 
-daocloud使用安全构建： 创建项目->安全构建
+daocloud 使用安全构建： 创建项目->安全构建
 
-安全构建有2步，第一步为build，构建一个临时镜像 第二步为将临时镜像打包，开始安全构建
+安全构建有 2 步，第一步为 build，构建一个临时镜像 第二步为将临时镜像打包，开始安全构建
 
-## 三、3个关键文件
-<!--more-->
+## 三、3 个关键文件
+
 ### 一、Dockerfile
 
 ```dockerfile
@@ -57,13 +59,13 @@ RUN npm config set registry https://registry.npm.taobao.org
 RUN cd /tmp && npm install && mkdir -p /opt/workdir && mv /tmp/node_modules /opt/workdir/
 ```
 
-就是利用缓存进行构建的优化，只有这样，才能利用上次缓存不重新安装npm包。否则每次都重新安装npm包消耗大量的构建时间。
+就是利用缓存进行构建的优化，只有这样，才能利用上次缓存不重新安装 npm 包。否则每次都重新安装 npm 包消耗大量的构建时间。
 
-这个Dockerfile很显然是build过程
+这个 Dockerfile 很显然是 build 过程
 
-构建结束后，会生成dist目录。我们发布的时候需要把dist的目录丢到网站root目录。
+构建结束后，会生成 dist 目录。我们发布的时候需要把 dist 的目录丢到网站 root 目录。
 
-daocloud安全构建的第二步骤可以将第一步骤中的文件提取出来。
+daocloud 安全构建的第二步骤可以将第一步骤中的文件提取出来。
 
 文件提取的目录为： /opt/workdir/dist
 
@@ -164,7 +166,7 @@ http {
 }
 ```
 
-因为vue-route开启了history模式。需要配置不同的nginx.conf
+因为 vue-route 开启了 history 模式。需要配置不同的 nginx.conf
 
 ## 四、提供持续集成服务的网站
 

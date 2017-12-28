@@ -47,6 +47,7 @@ menu:
   home: /
   #categories: /categories
   #about: /about
+  algorithm: /categories/Algorithm
   archives: /archives
   tags: /tags
   #sitemap: /sitemap.xml
@@ -69,6 +70,7 @@ menu_icons:
   archives: archive
   sitemap: sitemap
   commonweal: heartbeat
+  algorithm: comments-o
 
 
 
