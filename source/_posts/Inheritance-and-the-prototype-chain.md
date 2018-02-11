@@ -23,7 +23,7 @@ bird.__proto__ === animal // true
 animal.__proto__.__proto__ === null // true
 ```
 
-
+<!--more-->
 
 ### 二、继承的实现
 
