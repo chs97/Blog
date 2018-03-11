@@ -68,6 +68,10 @@ app.listen(3000)
 
 只能发送get请求，感觉这不是正经的手段，而是一个奇淫巧技。
 
+对于，为什么浏览器对于JavaScript不做同源策略这个问题，我觉得主要原因是需要后端的支持，他需要通过后端返回的内容，并且执行，产生回调才可以取得到结果。然而ajax不一样，js可以直接拿到ajax的返回结果。
+
+还有一种可能就是，静态资源需要放到CDN上，或者引用一些公共的脚本，应该是需求导致。
+
 ##### 2.CORS
 
 CORS是一个W3C标准，全称是"跨域资源共享"（Cross-origin resource sharing）。
@@ -149,9 +153,36 @@ app.listen(3000)
 
 #### 四、跨源网络访问
 
-##### 1.跨域写操作
+##### 1.通常允许跨域写操作
 
-##### 2.跨域资源嵌入
+例如：links，重定向（传统页面的跳转），以及表单提交。特定少数的HTTP请求需要添加 [preflight](https://developer.mozilla.org/zh-CN/docs/HTTP/Access_control_CORS#Preflighted_requests)。
+
+##### 2.通常允许跨域资源嵌入
+
+- `<script src="..."></script>` 标签嵌入跨域脚本。语法错误信息只能在同源脚本中捕捉到。
+- `<link rel="stylesheet" href="...">` 标签嵌入CSS。由于CSS的[松散的语法规则](http://scarybeastsecurity.blogspot.dk/2009/12/generic-cross-browser-cross-domain.html)，CSS的跨域需要一个设置正确的`Content-Type` 消息头。不同浏览器有不同的限制： [IE](http://msdn.microsoft.com/zh-CN/library/ie/gg622939%28v=vs.85%29.aspx), [Firefox](http://www.mozilla.org/security/announce/2010/mfsa2010-46.html), [Chrome](http://code.google.com/p/chromium/issues/detail?id=9877), [Safari](http://support.apple.com/kb/HT4070) (跳至CVE-2010-0051)部分 和 [Opera](http://www.opera.com/support/kb/view/943/)。
+- `<img>`嵌入图片。支持的图片格式包括PNG,JPEG,GIF,BMP,SVG,...
+- `video`和 `audio`嵌入多媒体资源。
+- `@font-face` 引入的字体。一些浏览器允许跨域字体（ cross-origin fonts），一些需要同源字体（same-origin fonts）。
+- `<iframe>` 载入的任何资源。站点可以使用[X-Frame-Options](https://developer.mozilla.org/zh-CN/docs/HTTP/X-Frame-Options)消息头来阻止这种形式的跨域交互。
+
+曾经就遇到过字体文件跨域问题，在引入fontawesome的时候，webpack打包之后上传到服务器，浏览器加载不到字体文件，错误显示了跨域的问题。解决方案需要在nginx配置请求字体文件返回的请求头
+
+```nginx
+location ~* \.(eot|ttf|woff|svg|otf)$ {
+     add_header Access-Control-Allow-Origin *;
+}
+```
+
+##### 3.canvas中img的跨域
+
+> HTML 规范中图片有一个 `crossorigin` 属性，结合合适的 [CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS) 响应头，就可以实现在画布中使用跨域<img> 元素的图像。
+
+有一次有个需求，就是对页面进行截图，我的方案是html2canvas ,canvs2image，结果导致了部分图片截不下来，其原因就是canvas画布被污染了。
+
+> 尽管不通过 CORS 就可以在画布中使用图片，但是这会**污染**画布。一旦画布被污染，你就无法读取其数据。例如，你不能再使用画布的 `toBlob()`, `toDataURL()` 或 `getImageData()` 方法，调用它们会抛出安全错误。
+
+解决办法对画布中的图片配置`img.crossOrigin = "Anonymous";`
 
 ### CSRF与XSS
 
@@ -165,7 +196,53 @@ app.listen(3000)
 
 ##### 1.CSRF是什么
 
+Cross-site request forgery 跨站请求伪造，也被称为 “one click attack” 或者 session riding，通常缩写为 CSRF 或者 XSRF，是一种对网站的恶意利用。CSRF 则通过伪装来自受信任用户的请求来利用受信任的网站。
+
 ##### 2.怎么预防
+
+从它的原理来讲，我们的目的就是，不让已经登录A网站的用户，打开B网站后，受到攻击，也就是说，不让B网站向A网站发送有效的请求，获得用户在A网站的信息或者进行破坏。
+
+###### Token
+
+1.SSR
+
+大部分SSR的网站都使用form表单进行提交内容的，这时候如果B网站也构造一个和A网站一样的form表单，一样可以提交内容到A网站。
+
+我们只需要一个能验证身份的，能证明这个请求是从A发出来的，而不是B发出来的就可以了。如下面Codeforces的Login
+
+```html
+<form method="post" action="" id="enterForm"><input type="hidden" name="csrf_token" value="635faaad128c55d2849b89e80bf790a3">
+            <table class="table-form">
+                <input type="hidden" name="action" value="enter">
+                <input type="hidden" name="ftaa" value="">
+                <input type="hidden" name="bfaa" value="">
+               
+        <input type="hidden" name="_tta" value="243"></form>
+```
+
+在生成form的时候，后台插入了一个csrf_token用来验证请求来源，这个csrf_tokenB网站是拿不到的，所以这样就能验证请求是从A发出来的而不是B。
+
+2.SPA
+
+对于SPA，非SSR，无法在form中嵌入一个csrf_token，一般后台是不会把*Origin*设置成\*的，可以直接限制请求来源，有一点得注意的，请求必须保证不能用form构造出来，比如可以使用json交互。如果后台偷懒，像我一样，直接用个中间件没有设置啥的话，默认是不做跨域限制的。
+
+这时候就将身份验证信息放在localStorage或者其他地方，总之不要放在cookie中，我们每次请求带上信息。B网站是读不到这些信息的，也就无法攻击了。
+
+###### SameSite
+
+关于这个SameSite好像使用得非常少。
+
+SameSite-cookies是一种机制，用于定义cookie如何跨域发送。这是谷歌开发的一种安全机制，并且现在在最新版本（Chrome Dev 51.0.2704.4）中已经开始实行了。SameSite-cookies的目的是尝试阻止CSRF（Cross-site request forgery 跨站请求伪造）以及XSSI（Cross Site Script Inclusion (XSSI) 跨站脚本包含）攻击。
+
+似乎，只有在chrome浏览器才有这个机制。
+
+这个的原理是阻止第三方cookie的发送，比如：B网站向A网站的接口发送请求，是不会带上A网站已有的cookie的，而A网站向A网站的接口发送请求，还是会带上cookie的。这是浏览器的一种机制。具体的请看参考链接中的`再见，CSRF：讲解set-cookie中的SameSite属性`
+
+###### 检查来源
+
+验证referer字段
+
+HTTP头有一个字段叫做referer它记录了该 HTTP 请求的来源地址。后台可以根据这个字段来判断这个请求是否是从网站A发出的，如果不是，就是不合法的请求。
 
 #### 参考链接
 
@@ -174,3 +251,9 @@ app.listen(3000)
 [浏览器的同源策略](https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy)
 
 [HTTP访问控制（CORS）](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)
+
+[启用了 CORS 的图片](https://developer.mozilla.org/zh-CN/docs/Web/HTML/CORS_enabled_image)
+
+[再见，CSRF：讲解set-cookie中的SameSite属性](https://www.anquanke.com/post/id/83773)
+
+[CSRF 攻击的应对之道](https://www.ibm.com/developerworks/cn/web/1102_niugang_csrf/)
