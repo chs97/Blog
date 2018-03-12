@@ -145,7 +145,70 @@ app.listen(3000)
 
 同字面意思，内容是允许的额外的请求头
 
-#####3.通过iframe
+##### 3.通过iframe
+
+没有特殊情况下，iframe的加载是没有跨域限制的。`<iframe>` 载入的任何资源是允许跨域的。我们可以通过几个手段，让iframe的内容，传递到父窗口中。
+
+1.Window.name + iframe
+
+- window.name属性值在文档刷新后依旧存在的能力（且最大允许2M左右）。
+- 每个iframe都有包裹它的window。
+- contenWindow返回的是`<iframe>`元素的window对象
+
+```html
+// localhost:3001/index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+    <script>
+    var iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    var state = 0 // 设置状态防止页面无限刷新
+    iframe.onload = function() {
+      if (state == 1) {
+        console.log(iframe.contentWindow.name)
+        // 清除创建的iframe
+        iframe.contentWindow.document.write('');
+        iframe.contentWindow.close();
+        document.body.removeChild(iframe);
+      } else if (state == 0) {
+        state = 1
+        iframe.contentWindow.location = 'http://localhost:3001/proxy.html'; //加载完成，iframe指回当前域
+        // 防止 Blocked a frame with origin "xxxx" from accessing a cross-origin frame.错误
+      }
+    }
+    iframe.src = 'http://localhost:3000/';
+    document.body.appendChild(iframe);
+  </script>
+</body>
+</html>
+```
+
+```javascript
+// localhost:3000,server
+const koa = require('koa')
+// const cors = require('koa2-cors')
+const app = new koa()
+// app.use(cors())
+app.use(async ctx => {
+  data = '\'hello world\''
+  ctx.body = `
+    <h1>${data}</h1>
+    <script>
+      window.name = ${data}
+    </script>
+  `;
+});
+app.listen(3000)
+```
+
+结果： 浏览器console 输出 hello world，表示我们在localhost:3001中拿到了localhost:3000的数据。
+
+
 
 #### 三、为什么浏览器需要同源策略
 
@@ -188,9 +251,58 @@ location ~* \.(eot|ttf|woff|svg|otf)$ {
 
 #### 一、XSS
 
+> 跨站脚本（英语：Cross-site scripting，通常简称为：XSS）是一种网站应用程序的安全漏洞攻击，是代码注入的一种。它允许恶意用户将代码注入到网页上，其他用户在观看网页时就会受到影响。这类攻击通常包含了HTML以及用户端脚本语言。
+>
+> XSS其实是为了和CSS做区分吧。
+
+在好几年前，XSS非常流行，可以用XSS获得用户的cookie，浏览器版本等信息，比如如果使用XSS获得到了管理员的cookie，那网站可就危险了。随着行业的发展，XSS越来越受重视，浏览器也对这种手段做了一定的预防，比如同源策略？CSP?
+
 ##### 1.XSS是什么
 
+###### 反射型
+
+反射型的攻击需要攻击者去欺骗用户点击，或者脚本当作url参数注入到页面中。
+
+举个栗子
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    var str = window.location.href.split('injection=')[1]
+    document.write('<script>' +
+      decodeURIComponent(str) +
+      '<\/script>')
+  </script>
+
+</html>
+```
+
+浏览器输入url+?injection=alert(1)
+
+这时候会弹出一个弹窗内容为1，这就是XSS注入的一种方式。
+
+###### 存储型
+
+存储型比反射型的危害更大，因为存储型是用户把攻击代码提交到数据库中，当别的用户访问时，数据库把攻击代码返回给用户，用户就会受到攻击。
+
+[xss link&svg黑魔法](https://lorexxar.cn/2015/11/19/xss-link/)
+
 ##### 2.怎么预防XSS
+
+1. 尽量不在特定地方输出不可信变量：script / comment / attribute / tag / style， 因为逃脱 HTMl 规则的字符串太多了。
+2. 将不可信变量输出到 div / body / attribute / javascript tag / style 之前，对 `& < > " ' /` 进行转义
+3. 将不可信变量输出 URL 参数之前，进行 URLEncode
+4. 使用合适的 HTML 过滤库进行过滤。介绍个库[Secure XSS Filters](https://github.com/yahoo/xss-filters)
+5. 预防 DOM-based XSS，见 [DOM based XSS Prevention Cheat Sheet](https://www.owasp.org/index.php/DOM_based_XSS_Prevention_Cheat_Sheet)
+6. 开启 HTTPOnly cookie，让浏览器接触不到 cookie
 
 #### 二、CSRF
 
@@ -244,6 +356,30 @@ SameSite-cookies是一种机制，用于定义cookie如何跨域发送。这是�
 
 HTTP头有一个字段叫做referer它记录了该 HTTP 请求的来源地址。后台可以根据这个字段来判断这个请求是否是从网站A发出的，如果不是，就是不合法的请求。
 
+##### 3.CSRF窃取
+
+利用CSS手段，有很多网站其实是把token放在一个隐藏的input中的，css中有一个input的选择器，可以匹配出input中以某个字符串开头，通过选择器，加载一个外部资源，例如背景图片。但是这有个前提，需要原来的页面存在注入，例如文章里这段代码。
+
+```html
+<form action="https://security.love" id="sensitiveForm">
+    <input type="hidden" id="secret" name="secret" value="dJ7cwON4BMyQi3Nrq26i">
+</form>
+<script src="mockingTheBackend.js"></script>
+<script>
+    var fragment = decodeURIComponent(window.location.href.split("?injection=")[1]);
+    var htmlEncode = fragment.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    document.write("<style>" + htmlEncode + "</style>");
+</script>
+```
+
+从url中的queryString获取参数，插入到dom中，dom中加载样式，来猜解token。
+
+查看该demo的源代码就知道原理了。
+
+[demo](https://security.love/cssInjection/attacker.html)
+
+
+
 #### 参考链接
 
 [跨域资源共享 CORS 详解](http://www.ruanyifeng.com/blog/2016/04/cors.html)
@@ -257,3 +393,10 @@ HTTP头有一个字段叫做referer它记录了该 HTTP 请求的来源地址。
 [再见，CSRF：讲解set-cookie中的SameSite属性](https://www.anquanke.com/post/id/83773)
 
 [CSRF 攻击的应对之道](https://www.ibm.com/developerworks/cn/web/1102_niugang_csrf/)
+
+[利用CSS注入（无iFrames）窃取CSRF令牌](http://www.freebuf.com/articles/web/162687.html)
+
+[内容安全策略( CSP )](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CSP)
+
+[XSS 攻击的处理](https://blog.alswl.com/2017/05/xss/)
+
