@@ -1,9 +1,10 @@
 ---
 title: [译] 一些ES6的小技巧
 date: 2018-04-02 18:45:34
-tags: 前端
+tags: 
+  - JavaScript
+categories: 前端
 ---
-
 
 
 > 原文： [Check out these useful ECMAScript 2015 (ES6) tips and tricks](https://medium.freecodecamp.org/check-out-these-useful-ecmascript-2015-es6-tips-and-tricks-6db105590377)
