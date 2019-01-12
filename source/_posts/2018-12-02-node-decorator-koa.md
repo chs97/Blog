@@ -33,6 +33,8 @@ console.log(new A().name); // hello world
 
 [![Edit TypeScript playground](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/m436r9nnyy)
 
+<!--more-->
+
 ### 差异
 
 装饰器装饰不同类型的目标是有一些差异的，这些差异体现在装饰函数接受的参数里面。
