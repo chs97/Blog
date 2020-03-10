@@ -1,0 +1,802 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="JavaScript,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="一、盒模型 在浏览器中有2种盒模型：W3C标准（标准盒模型），IE采用的盒模型称为（怪异盒模型），大部分浏览器在支持W3C标准的情况下还保留了IE采用的盒模型，在css3中可以通过box-sizing来设置。 当不对Doctype进行定义时，会触发怪异模式。">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="盒模型与BFC">
+<meta property="og:url" content="http://www.hs97.cn/2018/02/23/block-formatting-context/index.html">
+<meta property="og:site_name" content="Chs97&#39;s Blog">
+<meta property="og:description" content="一、盒模型 在浏览器中有2种盒模型：W3C标准（标准盒模型），IE采用的盒模型称为（怪异盒模型），大部分浏览器在支持W3C标准的情况下还保留了IE采用的盒模型，在css3中可以通过box-sizing来设置。 当不对Doctype进行定义时，会触发怪异模式。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.hs97.cn/2018/02/23/block-formatting-context/content.png">
+<meta property="og:image" content="http://www.hs97.cn/2018/02/23/block-formatting-context/border.png">
+<meta property="og:updated_time" content="2020-03-10T03:55:08.547Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="盒模型与BFC">
+<meta name="twitter:description" content="一、盒模型 在浏览器中有2种盒模型：W3C标准（标准盒模型），IE采用的盒模型称为（怪异盒模型），大部分浏览器在支持W3C标准的情况下还保留了IE采用的盒模型，在css3中可以通过box-sizing来设置。 当不对Doctype进行定义时，会触发怪异模式。">
+<meta name="twitter:image" content="http://www.hs97.cn/2018/02/23/block-formatting-context/content.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.hs97.cn/2018/02/23/block-formatting-context/">
+
+
+
+
+
+  <title>盒模型与BFC | Chs97's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Chs97's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-algorithm">
+          <a href="/categories/Algorithm" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-comments-o"></i> <br>
+            
+            算法
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.hs97.cn/2018/02/23/block-formatting-context/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chs97">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chs97's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                盒模型与BFC
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-23T15:05:06+00:00">
+                2018-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="一、盒模型"><a href="#一、盒模型" class="headerlink" title="一、盒模型"></a>一、盒模型</h3><blockquote>
+<p>在浏览器中有2种盒模型：W3C标准（标准盒模型），IE采用的盒模型称为（怪异盒模型），大部分浏览器在支持W3C标准的情况下还保留了IE采用的盒模型，在css3中可以通过box-sizing来设置。</p>
+<p>当不对Doctype进行定义时，会触发怪异模式。</p>
+</blockquote>
+<a id="more"></a>
+<p>如下例子：</p>
+<iframe width="100%" height="300" src="//jsfiddle.net/Chs97/e6xt1kro/embedded/html,css,result/" allowpaymentrequest allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+<h4 id="1-标准盒模型"><a href="#1-标准盒模型" class="headerlink" title="1.标准盒模型"></a>1.标准盒模型</h4><p><img src="content.png" alt></p>
+<p>在标准盒模型下：一个块的总宽度为：width+padding(left+right)+border(left+right)</p>
+<p>####2.怪异盒模型</p>
+<p><img src="border.png" alt></p>
+<p>在怪异盒模型下：一个块的总宽度为：width</p>
+<p>也就是说，内容的宽度应该为width - (border-left + padding-left + padding-right + border-right)</p>
+<h3 id="二、行内元素与块级元素"><a href="#二、行内元素与块级元素" class="headerlink" title="二、行内元素与块级元素"></a>二、行内元素与块级元素</h3><blockquote>
+<p>HTML (超文本标记语言) 元素大多数都是<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Inline_elemente" target="_blank" rel="noopener">行内元素</a>或<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Block-level_elements" target="_blank" rel="noopener">块级元素</a>。</p>
+</blockquote>
+<h4 id="1-行内元素"><a href="#1-行内元素" class="headerlink" title="1.行内元素"></a>1.行内元素</h4><blockquote>
+<p>一个行内元素只占据它对应标签的边框所包含的空间。一般情况下，行内元素只能包含文本数据或者其他行内元素。例子：</p>
+</blockquote>
+<iframe width="100%" height="300" src="//jsfiddle.net/Chs97/hs9dpk69/2/embedded/html,css,result/" allowpaymentrequest allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+<p>行内元素会在水平上一个接着一个排列。</p>
+<h4 id="2-块级元素"><a href="#2-块级元素" class="headerlink" title="2.块级元素"></a>2.块级元素</h4><blockquote>
+<p>块级元素占据其父元素（容器）的整个空间，因此创建了一个“块”。通常浏览器会在块级元素前后另起一个新行。例子：</p>
+</blockquote>
+<iframe width="100%" height="300" src="//jsfiddle.net/Chs97/kw1a3wug/embedded/html,css,result/" allowpaymentrequest allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+<p>一般情况下，每一个块级元素的默认宽度与父元素相同。</p>
+<h4 id="3-display属性"><a href="#3-display属性" class="headerlink" title="3.display属性"></a>3.display属性</h4><ul>
+<li>当元素的CSS属性<code>display</code>为<code>block</code>，<code>list-item</code>或 <code>table</code>时，它是块级元素 ；</li>
+</ul>
+<ul>
+<li>当元素的CSS属性<code>display</code>的计算值为<code>inline</code>，<code>inline-block</code>或<code>inline-table</code>时，称它为行内级元素；</li>
+</ul>
+<h3 id="三、块格式化上下文（Block-Formatting-Context）"><a href="#三、块格式化上下文（Block-Formatting-Context）" class="headerlink" title="三、块格式化上下文（Block Formatting Context）"></a>三、块格式化上下文（Block Formatting Context）</h3><h4 id="1-BFC"><a href="#1-BFC" class="headerlink" title="1.BFC"></a>1.BFC</h4><blockquote>
+<p><strong>块格式化上下文（Block Formatting Context，BFC）</strong>是Web页面的可视化CSS渲染的部分，是块级盒布局发生的区域，也是浮动元素与其他元素交互的区域。</p>
+</blockquote>
+<h4 id="2-特征"><a href="#2-特征" class="headerlink" title="2.特征"></a>2.特征</h4><ol>
+<li>内部的盒会在垂直方向一个接一个排列（可以看作BFC中有一个的常规流）；</li>
+<li>处于同一个BFC中的元素相互影响，可能会发生margin collapse；</li>
+<li>每个元素的margin box的左边，与容器块border box的左边相接触(对于<strong>从左往右的格式化</strong>，否则相反)。即使存在浮动也是如此；</li>
+<li>BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素，反之亦然；</li>
+<li>计算BFC的高度时，考虑BFC所包含的所有元素，连浮动元素也参与计算；</li>
+<li>浮动盒区域不叠加到BFC上；</li>
+</ol>
+<h4 id="3-BFC创建"><a href="#3-BFC创建" class="headerlink" title="3.BFC创建"></a>3.BFC创建</h4><ul>
+<li>根元素或其它包含它的元素</li>
+<li>浮动元素 (元素的 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/float" target="_blank" rel="noopener"><code>float</code></a> 不是 <code>none</code>)</li>
+<li>绝对定位元素 (元素的 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/position" target="_blank" rel="noopener"><code>position</code></a> 为 <code>absolute</code> 或 <code>fixed</code>)</li>
+<li>内联块元素 (元素具有 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/display" target="_blank" rel="noopener"><code>display</code></a><code>: inline-block</code>)</li>
+<li>表格单元格 (元素具有 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/display" target="_blank" rel="noopener"><code>display</code></a><code>: table-cell，HTML表格单元格默认属性</code>)</li>
+<li>表格标题 (元素具有 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/display" target="_blank" rel="noopener"><code>display</code></a><code>: table-caption</code>, HTML表格标题默认属性)</li>
+<li>匿名表格元素 (元素具有 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/display" target="_blank" rel="noopener"><code>display</code></a><code>: table</code>, <code>table-row</code>, <code>table-row-group</code>, <code>table-header-group</code>, <code>table-footer-group</code> [分别是HTML tables, table rows, table bodies, table headers and table footers的默认属性]，或 <code>inline-table</code> )</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/overflow" target="_blank" rel="noopener"><code>overflow</code></a> 值不为 <code>visible</code> 的块元素，</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/display" target="_blank" rel="noopener"><code>display</code></a> 值为 <code>flow-root</code> 的元素</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/contain" target="_blank" rel="noopener"><code>contain</code></a> 值为 <code>layout</code>, <code>content</code>, 或 <code>strict</code> 的元素</li>
+<li>弹性元素 (<a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/display" target="_blank" rel="noopener"><code>display</code></a><code>: flex</code> 或 <code>inline-flex</code>元素的子元素)</li>
+<li>网格元素 (<a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/display" target="_blank" rel="noopener"><code>display</code></a><code>: grid</code> 或 <code>inline-grid</code> 元素的子元素)</li>
+<li>多列容器 (元素的 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/column-count" target="_blank" rel="noopener"><code>column-count</code></a> 或 <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/column-width" target="_blank" rel="noopener"><code>column-width</code></a> 不为 <code>auto</code> 即视为多列，<code>column-count: 1</code>的元素也属于多列)</li>
+<li>即便具有 <code>column-span: all</code> 的元素没有被包裹在一个多列容器中，<a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/column-span" target="_blank" rel="noopener"><code>column-span</code></a><code>: all</code>也始终会创建一个新的格式化上下文。</li>
+</ul>
+<h4 id="4-实例"><a href="#4-实例" class="headerlink" title="4.实例"></a>4.实例</h4><h5 id="一、同一个BFC中的相邻的2个块margin重叠"><a href="#一、同一个BFC中的相邻的2个块margin重叠" class="headerlink" title="一、同一个BFC中的相邻的2个块margin重叠"></a>一、同一个BFC中的相邻的2个块margin重叠</h5><iframe width="100%" height="300" src="//jsfiddle.net/efb521or/3/embedded/html,css,result/" allowpaymentrequest allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+<p>上面部分有2个块级元素，属于同一个BFC内（html），于是边距发生了重叠。</p>
+<p>而下面部分的2个块级元素，属于不同的BFC内，所以边距不发生重叠。</p>
+<h5 id="二、BFC中元素重叠"><a href="#二、BFC中元素重叠" class="headerlink" title="二、BFC中元素重叠"></a>二、BFC中元素重叠</h5><iframe width="100%" height="300" src="//jsfiddle.net/Chs97/015tgms2/2/embedded/html,css,result/" allowpaymentrequest allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+<p>如上：.main和.side重叠了，因为2个box都是属于同一个BFC的。如果.main没有产生浮动，那么.main与.side应该是垂直排列的，但是.main产生了浮动，所以2个box都是从左边开始排列，所以形成重叠。</p>
+<h5 id="三、高度坍塌"><a href="#三、高度坍塌" class="headerlink" title="三、高度坍塌"></a>三、高度坍塌</h5><iframe width="100%" height="300" src="//jsfiddle.net/Chs97/3m2zuy1h/2/embedded/html,css,result/" allowpaymentrequest allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+<p>这个看起来有点不整齐，为什么下面的contain会跑到上面去？因为上面的contain发生了高度坍塌，浮动元素的高度没有被计算进去。下面的contain，因为创建了BFC，所以BFC内浮动元素的高度被计算了进去，于是看到的是正常情况。</p>
+<h3 id="四、用途"><a href="#四、用途" class="headerlink" title="四、用途"></a>四、用途</h3><p>挖坑待填？</p>
+<h3 id="五、参考"><a href="#五、参考" class="headerlink" title="五、参考"></a>五、参考</h3><p><a href="https://juejin.im/post/59b73d5bf265da064618731d#heading-1" target="_blank" rel="noopener">学习 BFC</a></p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Visual_formatting_model" target="_blank" rel="noopener">视觉格式化模型</a></p>
+<p><a href="https://www.jianshu.com/p/9a3090f1924a" target="_blank" rel="noopener">CSS中 怪异盒模型VS标准盒模型</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/11/Inheritance-and-the-prototype-chain/" rel="next" title="继承和原型链">
+                <i class="fa fa-chevron-left"></i> 继承和原型链
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/10/same-origin/" rel="prev" title="跨域与同源策略探究">
+                跨域与同源策略探究 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Chs97">
+          <p class="site-author-name" itemprop="name">Chs97</p>
+           
+              <p class="site-description motion-element" itemprop="description">Just do it.</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、盒模型"><span class="nav-number">1.</span> <span class="nav-text">一、盒模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-标准盒模型"><span class="nav-number">1.1.</span> <span class="nav-text">1.标准盒模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、行内元素与块级元素"><span class="nav-number">2.</span> <span class="nav-text">二、行内元素与块级元素</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-行内元素"><span class="nav-number">2.1.</span> <span class="nav-text">1.行内元素</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-块级元素"><span class="nav-number">2.2.</span> <span class="nav-text">2.块级元素</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-display属性"><span class="nav-number">2.3.</span> <span class="nav-text">3.display属性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、块格式化上下文（Block-Formatting-Context）"><span class="nav-number">3.</span> <span class="nav-text">三、块格式化上下文（Block Formatting Context）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-BFC"><span class="nav-number">3.1.</span> <span class="nav-text">1.BFC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-特征"><span class="nav-number">3.2.</span> <span class="nav-text">2.特征</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-BFC创建"><span class="nav-number">3.3.</span> <span class="nav-text">3.BFC创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-实例"><span class="nav-number">3.4.</span> <span class="nav-text">4.实例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#一、同一个BFC中的相邻的2个块margin重叠"><span class="nav-number">3.4.1.</span> <span class="nav-text">一、同一个BFC中的相邻的2个块margin重叠</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#二、BFC中元素重叠"><span class="nav-number">3.4.2.</span> <span class="nav-text">二、BFC中元素重叠</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#三、高度坍塌"><span class="nav-number">3.4.3.</span> <span class="nav-text">三、高度坍塌</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、用途"><span class="nav-number">4.</span> <span class="nav-text">四、用途</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、参考"><span class="nav-number">5.</span> <span class="nav-text">五、参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chs97</span>
+  <a href="http://beian.miit.gov.cn">闽ICP备16001018号-1</a> 
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

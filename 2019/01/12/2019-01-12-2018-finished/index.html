@@ -1,0 +1,779 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="JavaScript, Algorithm, CSS, HTML, Vue.js">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="实习总结拿到腾讯这个 offer 纯属意外，当初得知需要线下面试的时候，拒绝了线下面试的邀请。最后面试官（现 leader）打电话过来问拒绝的原因，得知原因后 leader 给了个机会线上面，最后拿到了这份实习 offer。 从 7 月份实习到现在也半年多了，在这个半年多的时间里，接触到了不少东西，比如工具类vtools xboos mojo 等，也实践了很多自己的想法，还是有一些收获的，所以决定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实习总结">
+<meta property="og:url" content="http://www.hs97.cn/2019/01/12/2019-01-12-2018-finished/index.html">
+<meta property="og:site_name" content="Chs97&#39;s Blog">
+<meta property="og:description" content="实习总结拿到腾讯这个 offer 纯属意外，当初得知需要线下面试的时候，拒绝了线下面试的邀请。最后面试官（现 leader）打电话过来问拒绝的原因，得知原因后 leader 给了个机会线上面，最后拿到了这份实习 offer。 从 7 月份实习到现在也半年多了，在这个半年多的时间里，接触到了不少东西，比如工具类vtools xboos mojo 等，也实践了很多自己的想法，还是有一些收获的，所以决定">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-10T03:55:08.543Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实习总结">
+<meta name="twitter:description" content="实习总结拿到腾讯这个 offer 纯属意外，当初得知需要线下面试的时候，拒绝了线下面试的邀请。最后面试官（现 leader）打电话过来问拒绝的原因，得知原因后 leader 给了个机会线上面，最后拿到了这份实习 offer。 从 7 月份实习到现在也半年多了，在这个半年多的时间里，接触到了不少东西，比如工具类vtools xboos mojo 等，也实践了很多自己的想法，还是有一些收获的，所以决定">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.hs97.cn/2019/01/12/2019-01-12-2018-finished/">
+
+
+
+
+
+  <title>实习总结 | Chs97's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Chs97's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-algorithm">
+          <a href="/categories/Algorithm" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-comments-o"></i> <br>
+            
+            算法
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.hs97.cn/2019/01/12/2019-01-12-2018-finished/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chs97">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chs97's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                实习总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-12T21:07:45+00:00">
+                2019-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/随笔/" itemprop="url" rel="index">
+                    <span itemprop="name">随笔</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="实习总结"><a href="#实习总结" class="headerlink" title="实习总结"></a>实习总结</h1><p>拿到腾讯这个 offer 纯属意外，当初得知需要线下面试的时候，拒绝了线下面试的邀请。最后面试官（现 leader）打电话过来问拒绝的原因，得知原因后 leader 给了个机会线上面，最后拿到了这份实习 offer。</p>
+<p>从 7 月份实习到现在也半年多了，在这个半年多的时间里，接触到了不少东西，比如工具类<code>vtools</code> <code>xboos</code> <code>mojo</code> 等，也实践了很多自己的想法，还是有一些收获的，所以决定写一篇总结。</p>
+<h2 id="关于技术、业务"><a href="#关于技术、业务" class="headerlink" title="关于技术、业务"></a>关于技术、业务</h2><h3 id="文档输出"><a href="#文档输出" class="headerlink" title="文档输出"></a>文档输出</h3><p>刚来的时候和另外两个实习生写了大概 3 个礼拜的技术文档吧。补全了各种文档，也是第一次写技术文档。在写文档的过程中读完了<code>express-ci</code>的源码，这是一个<code>express</code>的改版，无中心路由的一个 node 框架，通过中间件解析出<code>querystring</code> 中的<code>path</code> <code>controller</code> <code>method</code> 然后实例化 controller 然后去调用，但是在阅读代码的过程中发现<code>express-ci</code>的几个问题</p>
+<ol>
+<li><code>express-ci</code>自己维护的中间件模型是混乱的。</li>
+<li><code>express-ci</code>频繁实例化<code>controller</code>的类，每一次请求都需要实例化一次</li>
+</ol>
+<p>这种无中心的路由方式其实有好有坏，好的在于下一个接手代码的人很容易的就能知道这个请求的处理方法在哪里，坏的在于管理混乱，并且对开发者约束太强。</p>
+<h3 id="工程开发体验"><a href="#工程开发体验" class="headerlink" title="工程开发体验"></a>工程开发体验</h3><p>刚开始实习的时候，大部分工程还在 svn 上，正在逐步的往 git 上迁移。当时的发布流程是本地构建文件，然后上传到 svn，再通过发布系统去拉 svn 的文件发布的 IDC，然后就会有特性相互覆盖的事件发生。并且由于所有人的构建环境都不一样，很危险，而且发布的时候 每个人的权限都非常大，经常都是免测发布，以至于，我刚到的时候都不敢用那个发布系统，每次都是找同事帮忙发，直到现在，我还是没学会那个发布系统（因为已经抛弃那个系统了）。</p>
+<p>给同事介绍 CI 和 CD 的概念之后，开始尝试提升整个开发的体验，想在现有的条件下，最轻量的接一个集成系统。研究了<code>Jenkins</code> <code>Drone</code> 还有部门的<code>Jats</code> <code>Jats</code>是部门一直有的集成系统，但是主要是针对 Cpp 和移动端的集成。经过以下尝试：</p>
+<ol>
+<li>drone 接入内部 git</li>
+<li>搭建 Jenkins 接入内部 git</li>
+<li>使用 jats 搭建 web 发布环境</li>
+</ol>
+<p>经过这些尝试后，使用了<code>jats</code>发布了一段时间，稍微提升了一点开发体验，但是其实感受没有特别明显。</p>
+<p>直到现在，公司内部有了类似 tranvisCI 的工具，公司内部几个 CI 系统的竞争，我们也选择了某个 CI 工具，开发体验有了大幅度提升，不需要 scp 去部署开发环境，不需要上传 svn 去部署测试环境和发 IDC。</p>
+<p>在探索这个的过程中还是有一些阻碍的，比如最开始由于公司网络隔离，导致构建的机器没办法通过 22 端口拉<code>git</code>的依赖。有一些私有依赖都是放在 git 上的，<code>npm install</code>的时候没办法拉下来这些依赖。于是写了一个工具去分析这些依赖，然后通过<code>git clone</code>的方式安装下来，场景越来越复杂，最后这个工具也迭代了好多版本。不过现在网络环境优化，已经弃用了这个工具了。</p>
+<p>还有测试环境隔离，在测试环境需要把不同版本隔离开来，于是写了一个工具，自动管理这些版本，工具在 github 私有仓库躺着。最后也没派上用场。因为 IDC 上不是 docker 环境，为了保持环境的一致性，所以最后写了个脚本，对代码工作目录和启动的端口做了隔离。</p>
+<p>这段时间也了解到了不少东西，比如<code>Monorepo</code> 与<code>Multirepos</code> 学到了一些相关的工具<code>lerna</code> <code>teambit</code>等。</p>
+<p>这部分应该是实习这段时间做出最大贡献的一部分吧。个人认为。</p>
+<a id="more"></a>
+<h3 id="Laya-小游戏"><a href="#Laya-小游戏" class="headerlink" title="Laya 小游戏"></a>Laya 小游戏</h3><p>又点了一个技能点，第一次尝试前端开发小游戏。世界杯期间，小游戏也刚刚开始火起来，所以有部分业务是小游戏的形式存在，为了维护这部分内容，去学习了 laya 框架，学习如何通过 laya 提供的 IDE 写一个小游戏，阅读了以前的一些代码。小游戏的交互比 web 复杂，同事在开发小游戏的时候，把 web 上的一些概念带到了游戏里面，我觉得还是不错的，比如路由和页面的概念。降低了一些开发门槛。</p>
+<h3 id="在线-JKC"><a href="#在线-JKC" class="headerlink" title="在线 JKC"></a>在线 JKC</h3><p>由于 JKC 原来团队人手不够，于是加入去开发 JKC，JKC 的一款在线的游戏，要求的及时性很高，所以用的 websocket，node 框架用的 socketcluster，前端是 vue。</p>
+<p>接手的时候发现了一些问题，比如所有消息都是全频道广播，但是其实这个产品是有房间的一个概念的，很多东西都不需要全频道广播，为了偷懒，所以全部消息都全频道广播，然后前端去过滤。所以接手的时候就把后端服务重构了一下，然后顺便了解了一下后端的 MQ 框架。</p>
+<p>对于这个项目的前端部分，这个项目的前端走向了一个极端，所有数据都放 store。连 modal 等都是用 store 去驱动的，这就算了，大部分数据还是通过事件去传递的。所以整个数据流非常混乱。</p>
+<p>经过这个项目后，变得极其讨厌 store 与 eventemitter</p>
+<h3 id="BY-小游戏"><a href="#BY-小游戏" class="headerlink" title="BY 小游戏"></a>BY 小游戏</h3><p>转了一圈又回到了小游戏的开发，这次的小游戏也是一个及时性很强的游戏，尝试了一个叫做<code>行为模式</code>的游戏设计模式，定义一些物体的类，并且在类上对这些物体定义它的行为，通过这些类和行为组合起来整个游戏。这个游戏特殊在于，所有计算模型都是在前端，但是是一个多人在线对战的游戏。所以会导致所有玩家的界面不一致，就会很奇怪，所以尝试了很多方案去同步所有玩家的画面，比如有一个玩家进入，其他玩家接收到玩家进入房间的消息就把自己画面中的内容同步给进入的那个玩家。经过很多尝试，但是毕竟存在网络延迟等一些因素，所以最后的结果也没有让人很满意。</p>
+<p>经历了这个项目，我感受到了和别人协同的重要性。很重要的一点，不要在别人不知情的情况下重构别人的代码，如果非得重构，一定要保持暴露的 api 和以前的一致性，如果没办法保证一致性，请通知其他同事，不然会给别人带来很大的困扰。（作为受害者深有感触）</p>
+<h3 id="VB"><a href="#VB" class="headerlink" title="VB"></a>VB</h3><p>上面的项目存在的时间都非常短，因为战略调整的原因，我们开始了 VB 项目，VB 这个项目 前端是 weex + ts，后端是 egg + ts 。// 阿里全家桶。在我所负责的业务中我尝试了一个新的想法：</p>
+<p>我认为 store 的本质是一个全局变量，只是它比较特殊，它挂在 vue 的原型链中。我认为 store 一定程度上破坏了整个应用，是具有副作用的，所以我尝试用各种办法来处理掉一些原来需要 store 的场景。</p>
+<p>我们的前端结构是<code>View --- Store --- Business</code> view 层很简单就是<code>.vue</code>文件。business 这一层是用来处理一些逻辑的，比如接口拉到的一些数据需要排序，或者需要几个接口组合的各种逻辑，并且不与 store 耦合，也就是说 business 不会去 commit 数据到 store。具体的业务逻辑：View 层所需要的数据都会从 business 或者 store 里面拿，view 层不进行任何重逻辑的处理。</p>
+<p>有以下几个场景：</p>
+<ol>
+<li>A 页面与 B 页面都依赖一个接口的数据，这个数据纯展示数据。在以前会将这个数据放在 store 中，这次我尝试在 business 使用 promise 做了一层 cache，将这个数据缓存在 business 中。不管先进入 A 页面还是 B 页面，都是调用 business 的提供的方法获得需要展示的数据。所以 A 和 B 其实就不相互依赖，因为如果使用 store，那么一定是 A 依赖 B 或者 B 依赖 A，总有一个要去 commit 数据到 store 的嘛。</li>
+<li>使用 promise 做缓存还能解决一些请求穿透的问题，如果缓存的是请求结果，那么同时有 2 个并发请求就会请求 2 次，如果缓存的是这个请求，有 2 个并发请求也只会请求 1 次。</li>
+<li>前置的接口拉到的一些数据，后置的请求需要依赖，比如前置请求拉到的一些 id 之类的东西，不给用户展示的。这些数据以前也会存放在 store 中。这次我在 business 中开了一片内存（其实是个对象），专门用来存放这些数据。虽然说还是一个变量，但是他没有暴露给其他模块，可以在 business 里面自己处理，自己消化。</li>
+<li>下单接口一般都会有预下单和正式下单，这 2 个步骤是一个事务，并且下单的请求依赖预下单的返回结果，如果预下单是个生产者，那么下单请求是它的唯一消费者，所以我把整个过程封装成了一个类。每次用户需要下单的时候我会实例化这个类，然后依次调用预下单和下单，如果中间某个过程取消了或者失败了，下次下单直接重新实例化这个类，就不需要关心怎么去清理一些垃圾（比如存放预下单返回的结果的变量）</li>
+</ol>
+<p>总结一下：</p>
+<p>关于 store，我认为只有符合一下条件的才需要放于 store</p>
+<ol>
+<li>多个组件共同依赖的状态</li>
+<li>这个状态会发生改变</li>
+<li>这个状态与 view 层有关，需要展示给用户的</li>
+</ol>
+<p>学习到了几个东西：</p>
+<ol>
+<li>to 函数，解决 try catch 的一个痛点，对代码风格有了很大的提升</li>
+<li>使用 promise 做缓存，解决了一定的请求穿透</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>以上是大部分这段实习期间的所感。还有一些边边角角的东西，比如特殊的 node rpc 请求库，后端是基于 gRpc 定制的一个协议，当初写了个 demo 就丢给同事去维护了。虽然我觉得还是缺点什么。。。</p>
+<p>这段时间基本把很多前端的应用场景都尝试了一遍： 小程序、小游戏、移动端、H5</p>
+<p>端越来越多，前端需要学习的东西也越来越多，小程序 快应用 移动端 各种各种的端出现，如何提升个人的核心竞争是一件头疼的事情。</p>
+<p>这段时间只发了 2 篇博客，一篇是<code>immer</code>源码解析，一篇是<code>实现一个装饰器风格的node框架</code> 。</p>
+<p>这段时间坚持打了 7 场的 LeetCode 周赛，坚持每周都去看前端周刊，知乎专栏。</p>
+<p>这段时间参加过一次前端大会（IMWeb）感谢 leader 给的票。</p>
+<p>这段时间很多项目半途而废。</p>
+<p>这段时间有了很多机会实践。</p>
+<h2 id="除了技术以外"><a href="#除了技术以外" class="headerlink" title="除了技术以外"></a>除了技术以外</h2><p>最大的感触还是最后拿了个白菜价的 offer 吧。后面这段时间没有刚开始那么努力了。感觉所有的努力都是无用功。但是还是接下了这个 offer，毕竟懒，也就这样了。</p>
+<p>王者荣耀也几个赛季都打上了王者。</p>
+<p>没有认识更多的人，只是有些人又开始有联系了。</p>
+<p>生活技能点没有发生变化，也没有学会做菜。</p>
+<p>体重没有明显下降。</p>
+<p>生活质量没有明显提高。</p>
+<p>赚多少花多少没有存钱。</p>
+<h2 id="展望-2019"><a href="#展望-2019" class="headerlink" title="展望 2019"></a>展望 2019</h2><p>加油。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/02/2018-12-02-node-decorator-koa/" rel="next" title="基于koa实现一个装饰器风格的框架">
+                <i class="fa fa-chevron-left"></i> 基于koa实现一个装饰器风格的框架
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Chs97">
+          <p class="site-author-name" itemprop="name">Chs97</p>
+           
+              <p class="site-description motion-element" itemprop="description">Just do it.</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实习总结"><span class="nav-number">1.</span> <span class="nav-text">实习总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于技术、业务"><span class="nav-number">1.1.</span> <span class="nav-text">关于技术、业务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文档输出"><span class="nav-number">1.1.1.</span> <span class="nav-text">文档输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#工程开发体验"><span class="nav-number">1.1.2.</span> <span class="nav-text">工程开发体验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Laya-小游戏"><span class="nav-number">1.1.3.</span> <span class="nav-text">Laya 小游戏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在线-JKC"><span class="nav-number">1.1.4.</span> <span class="nav-text">在线 JKC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BY-小游戏"><span class="nav-number">1.1.5.</span> <span class="nav-text">BY 小游戏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VB"><span class="nav-number">1.1.6.</span> <span class="nav-text">VB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.1.7.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#除了技术以外"><span class="nav-number">1.2.</span> <span class="nav-text">除了技术以外</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#展望-2019"><span class="nav-number">1.3.</span> <span class="nav-text">展望 2019</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chs97</span>
+  <a href="http://beian.miit.gov.cn">闽ICP备16001018号-1</a> 
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

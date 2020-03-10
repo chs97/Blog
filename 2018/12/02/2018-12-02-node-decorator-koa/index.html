@@ -1,0 +1,835 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Node,TypeScript,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="了解装饰器装饰器（Decorator）是用来修改类行为的一个函数（语法糖），在许多面向对象语言中都有这个东西。 语法装饰器是一个函数，接受 3 个参数target name descriptor  target 是被修饰的目标对象 name 是被修饰的属性名 descriptor 是属性的描述  定义一个装饰器函数 1234567function setName(target, name, des">
+<meta name="keywords" content="Node,TypeScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于koa实现一个装饰器风格的框架">
+<meta property="og:url" content="http://www.hs97.cn/2018/12/02/2018-12-02-node-decorator-koa/index.html">
+<meta property="og:site_name" content="Chs97&#39;s Blog">
+<meta property="og:description" content="了解装饰器装饰器（Decorator）是用来修改类行为的一个函数（语法糖），在许多面向对象语言中都有这个东西。 语法装饰器是一个函数，接受 3 个参数target name descriptor  target 是被修饰的目标对象 name 是被修饰的属性名 descriptor 是属性的描述  定义一个装饰器函数 1234567function setName(target, name, des">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://codesandbox.io/static/img/play-codesandbox.svg">
+<meta property="og:image" content="https://codesandbox.io/static/img/play-codesandbox.svg">
+<meta property="og:image" content="https://codesandbox.io/static/img/play-codesandbox.svg">
+<meta property="og:image" content="https://codesandbox.io/static/img/play-codesandbox.svg">
+<meta property="og:image" content="https://codesandbox.io/static/img/play-codesandbox.svg">
+<meta property="og:updated_time" content="2020-03-10T03:55:08.543Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于koa实现一个装饰器风格的框架">
+<meta name="twitter:description" content="了解装饰器装饰器（Decorator）是用来修改类行为的一个函数（语法糖），在许多面向对象语言中都有这个东西。 语法装饰器是一个函数，接受 3 个参数target name descriptor  target 是被修饰的目标对象 name 是被修饰的属性名 descriptor 是属性的描述  定义一个装饰器函数 1234567function setName(target, name, des">
+<meta name="twitter:image" content="https://codesandbox.io/static/img/play-codesandbox.svg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.hs97.cn/2018/12/02/2018-12-02-node-decorator-koa/">
+
+
+
+
+
+  <title>基于koa实现一个装饰器风格的框架 | Chs97's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Chs97's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-algorithm">
+          <a href="/categories/Algorithm" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-comments-o"></i> <br>
+            
+            算法
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.hs97.cn/2018/12/02/2018-12-02-node-decorator-koa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chs97">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chs97's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                基于koa实现一个装饰器风格的框架
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-02T22:04:53+00:00">
+                2018-12-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="了解装饰器"><a href="#了解装饰器" class="headerlink" title="了解装饰器"></a>了解装饰器</h2><p>装饰器（Decorator）是用来修改类行为的一个函数（语法糖），在许多面向对象语言中都有这个东西。</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>装饰器是一个函数，接受 3 个参数<code>target</code> <code>name</code> <code>descriptor</code></p>
+<ul>
+<li>target 是被修饰的目标对象</li>
+<li>name 是被修饰的属性名</li>
+<li>descriptor 是属性的描述</li>
+</ul>
+<p>定义一个装饰器函数</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setName</span>(<span class="params">target, name, descriptor</span>) </span>&#123;</span><br><span class="line">  target.prototype.name = <span class="string">"hello world"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@setName</span></span><br><span class="line"><span class="keyword">class</span> A &#123;&#125;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">new</span> A().name); <span class="comment">// hello world</span></span><br></pre></td></tr></table></figure>
+<p><a href="https://codesandbox.io/s/m436r9nnyy" target="_blank" rel="noopener"><img src="https://codesandbox.io/static/img/play-codesandbox.svg" alt="Edit TypeScript playground"></a></p>
+<a id="more"></a>
+<h3 id="差异"><a href="#差异" class="headerlink" title="差异"></a>差异</h3><p>装饰器装饰不同类型的目标是有一些差异的，这些差异体现在装饰函数接受的参数里面。</p>
+<p><a href="https://codesandbox.io/s/zq53nz8vj3" target="_blank" rel="noopener"><img src="https://codesandbox.io/static/img/play-codesandbox.svg" alt="Edit TypeScript playground"></a></p>
+<p>首先对一个类的装饰是由内到外的，先从类的属性开始，从上到下，按顺序修饰，如果类的属性是个方法，那么会先装饰这个方法的属性，再装饰这个方法。如上 demo 的 console</p>
+<h4 id="装饰-Class"><a href="#装饰-Class" class="headerlink" title="装饰 Class"></a>装饰 Class</h4><p>装饰函数接收到的参数 <code>target</code>是类的本身，<code>name</code>与<code>descriptor</code>都是<code>undefined</code></p>
+<h4 id="装饰-Class-的属性"><a href="#装饰-Class-的属性" class="headerlink" title="装饰 Class 的属性"></a>装饰 Class 的属性</h4><p>装饰函数接收到的参数<code>target</code>是类的原型，也就是<code>class.prototype</code></p>
+<p><code>name</code>为该属性的名字</p>
+<p>当这个属性是个函数时：</p>
+<p><code>descriptor</code>为该方法的描述，通过<code>Object.getOwnPropertyDescriptor(obj, prop)</code>获得</p>
+<p>当这个属性非函数时:</p>
+<p><code>descriptor</code>为<code>undefined</code></p>
+<h4 id="装饰-Class-方法的参数"><a href="#装饰-Class-方法的参数" class="headerlink" title="装饰 Class 方法的参数"></a>装饰 Class 方法的参数</h4><p>装饰函数接受到的参数<code>target</code>是类的原型</p>
+<p><code>name</code>为该参数的名字</p>
+<p><code>descriptor</code>为该参数是这个函数的第几个参数，<code>index:number</code></p>
+<h2 id="了解-Reflect-metadate"><a href="#了解-Reflect-metadate" class="headerlink" title="了解 Reflect.metadate"></a>了解 Reflect.metadate</h2><p>Reflect 可以理解为反射，可以改变<code>Object</code>的一些行为。</p>
+<p><a href="https://github.com/rbuckton/reflect-metadata" target="_blank" rel="noopener">reflect.metadata</a>从名字上看，就是对对象设置一些元数据。</p>
+<p>有 2 个比较重要的 api</p>
+<p><code>Reflect.getMetadata(key, target)</code>通过<code>key</code>获得在<code>target</code>上设置的元数据</p>
+<p><code>Reflect.defineMetadata(key, value, target)</code>通过<code>key</code>设置<code>value</code>到<code>target</code>上</p>
+<p>实现这个 2 个 api 不难，通过<code>weakMap</code>和<code>Map</code>就可以实现了。</p>
+<p>这样的数据结构</p>
+<p><code>weakMap[target, Map[key, value]]</code></p>
+<h2 id="koa-路由"><a href="#koa-路由" class="headerlink" title="koa 路由"></a>koa 路由</h2><p>koa 的中间件模型不做介绍，<code>koa-router</code>就是个中间件。</p>
+<p>路由其实就是映射一个<code>controller</code>方法到一个<code>path</code>字符串上。</p>
+<p>通过<code>ctx</code>去<code>match</code>匹配到的<code>path</code>然后调用这个<code>controller</code>方法。</p>
+<h2 id="简单的例子"><a href="#简单的例子" class="headerlink" title="简单的例子"></a>简单的例子</h2><p>在这个例子里面，通过装饰器，来实现绑定一个<code>Controller</code>方法到路由上。</p>
+<p>首先如上所说的，有以下思路：</p>
+<ol>
+<li>装饰器记录<code>Controller</code>元数据，实现一个 Bind 方法，取出元数据绑定到路由上</li>
+</ol>
+<p>实现一个装饰器<code>Router(path)</code>用来装饰<code>Controller</code>的方法</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> koa <span class="keyword">from</span> <span class="string">"koa"</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> router <span class="keyword">from</span> <span class="string">"koa-router"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> koaRouter = <span class="keyword">new</span> router();</span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> koa();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Router</span>(<span class="params">path</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">target, name</span>) </span>&#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bind</span>(<span class="params">router, controller</span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">class</span> Controller &#123;</span><br><span class="line">  <span class="meta">@Router</span>(<span class="string">"/hello"</span>)</span><br><span class="line">  sayHello(ctx) &#123;</span><br><span class="line">    ctx.body = <span class="string">"say hello"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">bind(koaRouter, Controller);</span><br><span class="line">app.use(koaRouter.routes());</span><br><span class="line">app.listen(<span class="number">8080</span>);</span><br></pre></td></tr></table></figure>
+<p>来实现<code>bind</code>方法和<code>Router</code>装饰器</p>
+<p>首先是<code>Router</code>装饰器</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Router</span>(<span class="params">path</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">target, name</span>) </span>&#123;</span><br><span class="line">    Reflect.defineMetadata(<span class="string">"path"</span>, &#123; path, name &#125;, target);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 装饰器如果需要传参得再装饰器上层封装一个函数，然后再返回这个装饰器函数</span></span><br></pre></td></tr></table></figure>
+<p>使用<code>Reflect.metadata</code>需要在程序的开始<code>import &quot;reflect-metadata&quot;;</code></p>
+<p>首先是<code>bind</code></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bind</span>(<span class="params">router, controller</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> meta = Reflect.getMetadata(<span class="string">"path"</span>, controller.prototype);</span><br><span class="line">  <span class="built_in">console</span>.log(meta);</span><br><span class="line">  <span class="keyword">const</span> instance = <span class="keyword">new</span> controller();</span><br><span class="line">  router.get(meta.path, <span class="function"><span class="params">ctx</span> =&gt;</span> &#123;</span><br><span class="line">    instance[meta.name](ctx);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的<code>bind</code>也很简单，首先是，装饰器装饰一个方法的<code>target</code>是类的原型，所以这边<code>getMetadata</code>的<code>target</code>应该是<code>controller.prototype</code>，meta 的属性<code>path</code>对应的是<code>/hello</code> <code>name</code>对应的是<code>sayHello</code>，然后就是实例化<code>controller</code>，然后通过 router 去绑定这个<code>path</code>和方法。</p>
+<p><a href="https://codesandbox.io/s/kw9lm323mr" target="_blank" rel="noopener"><img src="https://codesandbox.io/static/img/play-codesandbox.svg" alt="Edit node typescript"></a></p>
+<p>打开例子在右边的浏览器输入<code>/hello</code>就能看到<code>say hello</code>的输出。</p>
+<h2 id="进入正题"><a href="#进入正题" class="headerlink" title="进入正题"></a>进入正题</h2><p>进入正题，开始封装一个不是那么完整的装饰器框架。</p>
+<p>先定义一堆的<code>constants</code></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">enum</span> METHODS &#123;</span><br><span class="line">  GET = <span class="string">"get"</span>,</span><br><span class="line">  POST = <span class="string">"post"</span>,</span><br><span class="line">  PUT = <span class="string">"put"</span>,</span><br><span class="line">  DEL = <span class="string">"del"</span>,</span><br><span class="line">  ALL = <span class="string">"all"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> PATH = <span class="string">"DEC_PATH"</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> PARAM = <span class="string">"DEC_PARAM"</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h3><p>首先是各种请求方法<code>GET</code> <code>POST</code> <code>PUT</code> <code>DELETE</code></p>
+<p>因为现在有了请求方法的区分，所以在收集信息的时候需要加一个字段。</p>
+<p>现在收集信息的方法变为</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; METHODS, PATH &#125; <span class="keyword">from</span> <span class="string">"./constants"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">Route</span>(<span class="params">path: <span class="built_in">string</span>, verb: METHODS</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">target, name, descriptor</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> meta = Reflect.getMetadata(PATH, target) || [];</span><br><span class="line">    meta.push(&#123;</span><br><span class="line">      name,</span><br><span class="line">      verb,</span><br><span class="line">      path</span><br><span class="line">    &#125;);</span><br><span class="line">    Reflect.defineMetadata(PATH, meta, target);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看见，多了一个<code>verb</code>参数表示该<code>controller</code>的请求方法</p>
+<p>这边用数组是因为，<code>target</code>只有这个<code>controller</code>要记录的信息不止一个有很多。</p>
+<p>通过这个基础方法，再封装一下其他装饰器</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">ALL</span>(<span class="params">path: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Route(path, METHODS.ALL);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">GET</span>(<span class="params">path: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Route(path, METHODS.GET);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">POST</span>(<span class="params">path: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Route(path, METHODS.POST);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">PUT</span>(<span class="params">path: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Route(path, METHODS.PUT);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">DEL</span>(<span class="params">path: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Route(path, METHODS.DEL);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>装饰器写完，这里的<code>bind</code>应该和之前的不一样，毕竟<code>metadata</code>是个数组，处理起来其实没有区别，加个循环罢了。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> Router <span class="keyword">from</span> <span class="string">"koa-router"</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> Koa <span class="keyword">from</span> <span class="string">"koa"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; PATH &#125; <span class="keyword">from</span> <span class="string">"./constants"</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">BindRoutes</span>(<span class="params">koaRouter: Router, controllers: <span class="built_in">any</span>[]</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> ctrl of controllers) &#123;</span><br><span class="line">    <span class="keyword">const</span> pathMeta = Reflect.getMetadata(PATH, ctrl.prototype) || [];</span><br><span class="line">    <span class="built_in">console</span>.log(pathMeta);</span><br><span class="line">    <span class="keyword">const</span> instance = <span class="keyword">new</span> ctrl();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> item of pathMeta) &#123;</span><br><span class="line">      <span class="keyword">const</span> &#123; path, verb, name &#125; = item;</span><br><span class="line">      koaRouter[verb](path, <span class="function">(<span class="params">ctx: Koa.Context</span>) =&gt;</span> &#123;</span><br><span class="line">        instance[name](ctx);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的<code>pathMeta</code>的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[ &#123; name: &apos;sayHello&apos;, verb: &apos;get&apos;, path: &apos;/hello&apos; &#125;,</span><br><span class="line">  &#123; name: &apos;postMessage&apos;, verb: &apos;post&apos;, path: &apos;/post&apos; &#125;,</span><br><span class="line">  &#123; name: &apos;putName&apos;, verb: &apos;put&apos;, path: &apos;/put&apos; &#125;,</span><br><span class="line">  &#123; name: &apos;delMe&apos;, verb: &apos;del&apos;, path: &apos;/del&apos; &#125; ]</span><br></pre></td></tr></table></figure>
+<p><a href="https://codesandbox.io/s/vm25l81063" target="_blank" rel="noopener"><img src="https://codesandbox.io/static/img/play-codesandbox.svg" alt="Edit node typescript"></a></p>
+<p>点开例子右边的浏览输入<code>/get</code>就能预览得到，控制台也打印出来上面的输出。</p>
+<h3 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h3><p>请求方法处理完了，处理一下请求参数。</p>
+<p>举个例子</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">getUser(<span class="meta">@Body</span>() user, <span class="meta">@Param</span>(<span class="string">'id'</span>) id) &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>想要的是，这个<code>user</code>参数自动变成<code>ctx.body</code>, <code>id</code>变为<code>ctx.params.id</code>。</p>
+<p>如上，绑定路由的时候，<code>controller</code>的参数是传进去的，并且，在装饰器对函数参数进行装饰的时候，可以通过<code>descriptor</code>获得到这个参数在所有参数里面的第几个位置。所以通过这些特性，可以实现想要的需求。</p>
+<p>只要把<code>bind</code>方法改写成：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">instance[name](arg1, arg2, arg3);</span><br><span class="line"><span class="comment">// arg1 = ctx.body</span></span><br><span class="line"><span class="comment">// arg2 = ctx.params.id</span></span><br><span class="line"><span class="comment">// arg3 = .....</span></span><br></pre></td></tr></table></figure>
+<p>所有能从 ctx 中获取到的，都可以<code>ctx.body</code> <code>ctx.params</code> <code>ctx.query</code></p>
+<p>同样的，实现一个基础方法，叫做<code>Inject</code>来收集参数的信息</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">Inject</span>(<span class="params">fn: <span class="built_in">Function</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">target, name, descriptor</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> meta = Reflect.getMetadata(PARAM, target) || [];</span><br><span class="line">    meta.push(&#123;</span><br><span class="line">      name,</span><br><span class="line">      fn,</span><br><span class="line">      index: descriptor</span><br><span class="line">    &#125;);</span><br><span class="line">    Reflect.defineMetadata(PARAM, meta, target);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的的<code>fn</code>必须是个函数，因为需要通过请求的<code>ctx</code>拿到需要的值。这里的<code>index</code>是该变量在参数中的位置。</p>
+<p>实现了<code>Inject</code>接下来继续实现其他的装饰器</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">Ctx</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Inject(<span class="function"><span class="params">ctx</span> =&gt;</span> ctx);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">Body</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Inject(<span class="function"><span class="params">ctx</span> =&gt;</span> ctx.request.body);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">Req</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Inject(<span class="function"><span class="params">ctx</span> =&gt;</span> ctx.req);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">Res</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Inject(<span class="function"><span class="params">ctx</span> =&gt;</span> ctx.res);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">Param</span>(<span class="params">arg</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Inject(<span class="function"><span class="params">ctx</span> =&gt;</span> ctx.params[arg]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">Query</span>(<span class="params">arg</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Inject(<span class="function"><span class="params">ctx</span> =&gt;</span> ctx.query[arg]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这些装饰器都很简单，都是基于<code>Inject</code>，这个装饰器的函数会先收集起来，后面会用到。</p>
+<p>通过自己实现的<code>bind</code>函数可以很容易的把需要的参数传入到<code>controller</code>中</p>
+<p>看一下修改以后的<code>bind</code>函数</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> Router <span class="keyword">from</span> <span class="string">"koa-router"</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> Koa <span class="keyword">from</span> <span class="string">"koa"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; PATH, PARAM &#125; <span class="keyword">from</span> <span class="string">"./constants"</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">BindRoutes</span>(<span class="params">koaRouter: Router, controllers: <span class="built_in">any</span>[]</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> ctrl of controllers) &#123;</span><br><span class="line">    <span class="keyword">const</span> pathMeta = Reflect.getMetadata(PATH, ctrl.prototype) || [];</span><br><span class="line">    <span class="keyword">const</span> argsMeta = Reflect.getMetadata(PARAM, ctrl.prototype) || [];</span><br><span class="line">    <span class="built_in">console</span>.log(argsMeta);</span><br><span class="line">    <span class="keyword">const</span> instance = <span class="keyword">new</span> ctrl();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> item of pathMeta) &#123;</span><br><span class="line">      <span class="keyword">const</span> &#123; path, verb, name &#125; = item;</span><br><span class="line">      koaRouter[verb](path, <span class="function">(<span class="params">ctx: Koa.Context</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> args = argsMeta</span><br><span class="line">          .filter(<span class="function"><span class="params">i</span> =&gt;</span> i.name === name)</span><br><span class="line">          .sort(<span class="function">(<span class="params">a, b</span>) =&gt;</span> a.index - b.index)</span><br><span class="line">          .map(<span class="function"><span class="params">i</span> =&gt;</span> i.fn(ctx));</span><br><span class="line">        instance[name](...args, ctx);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>args</code>先<code>filter</code>出这个<code>controller</code>方法有关的参数，再根据这些参数的<code>index</code>排序，排序以后就是<code>args[i]</code>的 fn 函数<code>ctx =&gt; ctx.xxx</code>的形式，通过执行<code>fn(ctx)</code>可以拿到需要的值。</p>
+<p>最后执行<code>controller</code>的时候把这些值传入，就得到了想要的结果。</p>
+<p>所以上面<code>bind</code>函数的<code>args</code>就是通过装饰器得到的所需要的参数。</p>
+<p>这样来使用它们：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; GET, PUT, DEL, POST, Ctx, Param, Body &#125; <span class="keyword">from</span> <span class="string">"../src"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">class</span> Controller &#123;</span><br><span class="line">  <span class="meta">@GET</span>(<span class="string">"/:id"</span>)</span><br><span class="line">  sayHello(<span class="meta">@Ctx</span>() Ctx, <span class="meta">@Param</span>(<span class="string">"id"</span>) id, <span class="meta">@Query</span>(<span class="string">"name"</span>) name) &#123;</span><br><span class="line">    Ctx.body = <span class="string">"hello"</span> + id + name;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@POST</span>(<span class="string">"/post"</span>)</span><br><span class="line">  postMessage(<span class="meta">@Body</span>() body, ctx) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(body);</span><br><span class="line">    ctx.body = <span class="string">"post"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当请求进入<code>sayHello</code>绑定的路由的时候， <code>sayHello</code>会被执行，并且会传入以下参数执行。</p>
+<p><code>sayHello(ctx, ctx.params[&#39;id&#39;], ctx.query[&#39;name&#39;], ctx)</code></p>
+<p>至此，就封装出了一个很简陋的装饰器风格的框架。</p>
+<p><a href="https://codesandbox.io/s/xjk5470wrw" target="_blank" rel="noopener"><img src="https://codesandbox.io/static/img/play-codesandbox.svg" alt="Edit node typescript"></a></p>
+<p>可以在右边的浏览地址输入<code>123?name=chs97</code>可以看到<code>hello123chs97</code></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>装饰器还可以做很多事情，在这里主要使用装饰器来记录一些信息，然后通过其他方法获取这些信息出来，进行处理。</p>
+<p>装饰器风格的框架可以参考<code>nestjs</code> 这是一个完全装饰器风格的框架，和<code>Sprint boot</code>非常像，可以尝试体验一下。</p>
+<p>还有一些装饰器风格的库：</p>
+<ol>
+<li><a href="https://github.com/typeorm/typeorm" target="_blank" rel="noopener">Typeorm</a>装饰器风格的<code>ORM</code>框架</li>
+<li><a href="https://github.com/typestack/routing-controllers" target="_blank" rel="noopener">routing-controllers</a> 装饰器风格的框架可以使用<code>express</code>和<code>koa</code>做底层</li>
+<li><a href="https://github.com/swimlane/trafficlight" target="_blank" rel="noopener">trafficlight</a>装饰器风格的框架，底层为 koa</li>
+<li><a href="https://github.com/nestjs/nest" target="_blank" rel="noopener">nestjs</a>一个非常棒的 node 框架，开发体验非常好</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Node/" rel="tag"># Node</a>
+          
+            <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/06/2018-11-06-Immutable 与 Immer/" rel="next" title="Immutable 与 Immer">
+                <i class="fa fa-chevron-left"></i> Immutable 与 Immer
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/12/2019-01-12-2018-finished/" rel="prev" title="实习总结">
+                实习总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Chs97">
+          <p class="site-author-name" itemprop="name">Chs97</p>
+           
+              <p class="site-description motion-element" itemprop="description">Just do it.</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#了解装饰器"><span class="nav-number">1.</span> <span class="nav-text">了解装饰器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法"><span class="nav-number">1.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#差异"><span class="nav-number">1.2.</span> <span class="nav-text">差异</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#装饰-Class"><span class="nav-number">1.2.1.</span> <span class="nav-text">装饰 Class</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#装饰-Class-的属性"><span class="nav-number">1.2.2.</span> <span class="nav-text">装饰 Class 的属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#装饰-Class-方法的参数"><span class="nav-number">1.2.3.</span> <span class="nav-text">装饰 Class 方法的参数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#了解-Reflect-metadate"><span class="nav-number">2.</span> <span class="nav-text">了解 Reflect.metadate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#koa-路由"><span class="nav-number">3.</span> <span class="nav-text">koa 路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简单的例子"><span class="nav-number">4.</span> <span class="nav-text">简单的例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进入正题"><span class="nav-number">5.</span> <span class="nav-text">进入正题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#请求方法"><span class="nav-number">5.1.</span> <span class="nav-text">请求方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求参数"><span class="nav-number">5.2.</span> <span class="nav-text">请求参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chs97</span>
+  <a href="http://beian.miit.gov.cn">闽ICP备16001018号-1</a> 
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

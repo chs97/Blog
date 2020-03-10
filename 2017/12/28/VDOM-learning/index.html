@@ -1,0 +1,841 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="JavaScript,Vue.js,TypeScript,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="VDOMGithub 为什么要有VDOM一、DOM(Document Object Model)什么是DOM？ 在MDN上有这样的一段描述：  文档对象模型 (DOM) 是HTML和XML文档的编程接口。它提供了对文档的结构化的表述，并定义了一种方式可以使从程序中对该结构进行访问，从而改变文档的结构，样式和内容。DOM 将文档解析为一个由节点和对象（包含属性和方法的对象）组成的结构集合。简言之，它">
+<meta name="keywords" content="JavaScript,Vue.js,TypeScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习VDOM的原理">
+<meta property="og:url" content="http://www.hs97.cn/2017/12/28/VDOM-learning/index.html">
+<meta property="og:site_name" content="Chs97&#39;s Blog">
+<meta property="og:description" content="VDOMGithub 为什么要有VDOM一、DOM(Document Object Model)什么是DOM？ 在MDN上有这样的一段描述：  文档对象模型 (DOM) 是HTML和XML文档的编程接口。它提供了对文档的结构化的表述，并定义了一种方式可以使从程序中对该结构进行访问，从而改变文档的结构，样式和内容。DOM 将文档解析为一个由节点和对象（包含属性和方法的对象）组成的结构集合。简言之，它">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/ct_htmltree.gif">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/nodeElm.png">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/dfs.png">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/diff-1.png">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/diff-2.png">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/diff-3.png">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/diff-2-2.png">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/diff-5.png">
+<meta property="og:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/diff-6.png">
+<meta property="og:updated_time" content="2020-03-10T03:55:08.543Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="学习VDOM的原理">
+<meta name="twitter:description" content="VDOMGithub 为什么要有VDOM一、DOM(Document Object Model)什么是DOM？ 在MDN上有这样的一段描述：  文档对象模型 (DOM) 是HTML和XML文档的编程接口。它提供了对文档的结构化的表述，并定义了一种方式可以使从程序中对该结构进行访问，从而改变文档的结构，样式和内容。DOM 将文档解析为一个由节点和对象（包含属性和方法的对象）组成的结构集合。简言之，它">
+<meta name="twitter:image" content="http://www.hs97.cn/2017/12/28/VDOM-learning/ct_htmltree.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.hs97.cn/2017/12/28/VDOM-learning/">
+
+
+
+
+
+  <title>学习VDOM的原理 | Chs97's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Chs97's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-algorithm">
+          <a href="/categories/Algorithm" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-comments-o"></i> <br>
+            
+            算法
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.hs97.cn/2017/12/28/VDOM-learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chs97">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chs97's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                学习VDOM的原理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-28T18:50:29+00:00">
+                2017-12-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="VDOM"><a href="#VDOM" class="headerlink" title="VDOM"></a>VDOM</h1><p><a href="https://github.com/chs97/VDOM" target="_blank" rel="noopener">Github</a></p>
+<h2 id="为什么要有VDOM"><a href="#为什么要有VDOM" class="headerlink" title="为什么要有VDOM"></a>为什么要有VDOM</h2><h3 id="一、DOM-Document-Object-Model"><a href="#一、DOM-Document-Object-Model" class="headerlink" title="一、DOM(Document Object Model)"></a>一、DOM(Document Object Model)</h3><p><code>什么是DOM？</code></p>
+<p>在MDN上有这样的一段描述：</p>
+<blockquote>
+<p>文档对象模型 (DOM) 是HTML和XML文档的编程接口。它提供了对文档的结构化的表述，并定义了一种方式可以使从程序中对该结构进行访问，从而改变文档的结构，样式和内容。DOM 将文档解析为一个由节点和对象（包含属性和方法的对象）组成的结构集合。简言之，它会将web页面和脚本或程序语言连接起来。</p>
+<p>一个web页面是一个文档。这个文档可以在浏览器窗口或作为HTML源码显示出来。但上述两个情况中都是同一份文档。文档对象模型（DOM）提供了对同一份文档的另一种表现，存储和操作的方式。 DOM是web页面的完全的面向对象表述，它能够使用如 JavaScript等脚本语言进行修改。</p>
+</blockquote>
+<p>DOM可以将文档解析成一棵由节点和对象组成的树。</p>
+<a id="more"></a>
+<p>就像这样：</p>
+<p><img src="ct_htmltree.gif" alt="img"></p>
+<p>我们可以通过DOM来修改我们所能在页面中可以看见的东西</p>
+<h4 id="Node和Element"><a href="#Node和Element" class="headerlink" title="Node和Element"></a>Node和Element</h4><p><img src="nodeElm.png" alt="img"></p>
+<p>Node表示任意的DOM对象包括（document，document.body，任意的标签，或者文本节点）</p>
+<p>Element是Node中一个特殊的类型</p>
+<h3 id="二、没有VDOM"><a href="#二、没有VDOM" class="headerlink" title="二、没有VDOM"></a>二、没有VDOM</h3><p>DOM的存在，可以让我们修改页面中的任何可以看见的东西，但是，这些修改都是人为的，比如：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">id</span>=<span class="string">"text"</span>&gt;</span></span><br><span class="line">  Hello.</span><br><span class="line"><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>当我们打算修改id为text P标签里面的内容时：我们得先从DOM中得到这个Element节点。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> elm = <span class="built_in">document</span>.getElementById(<span class="string">'text'</span>)</span><br><span class="line"><span class="comment">// IE9+</span></span><br><span class="line"><span class="comment">// var elm = querySelector('#text')</span></span><br></pre></td></tr></table></figure>
+<p>然后再进行修改。这样做导致了一个问题：</p>
+<p>如果我们有一个list，内容比较多。那我们需要修改list中的某些item的内容怎么办？需要先检索一遍list，找出需要修改的Element，再进行修改。如果删除整个list然后重新create这个list呢？这样做浪费的时间当然比patch还大，createElement和removeElement都需要花费时间的。</p>
+<p>举个例子:</p>
+<p>旧的List</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span>1<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span>2<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>新的List</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span>1<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span>3<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>肉眼观察，我们需要修改ul中的第二个li。</p>
+<p>但是在和后端的交互中，你无法预测出要修改第几个li，可能是第一个？也可能是第二个？所以这时候就需要search来找出你需要第几个。</p>
+<p>可以这样：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> oldList = [<span class="number">1</span>, <span class="number">2</span>]</span><br><span class="line"><span class="keyword">var</span> newList = [<span class="number">1</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">var</span> result = diff(oldList, newList)</span><br></pre></td></tr></table></figure>
+<p>这样就知道需要修改第几个li节点了。</p>
+<p>但是如果结构复杂一点怎么办？而且，不仅仅是修改，还有添加和删除。</p>
+<h3 id="三、VDOM带来了什么"><a href="#三、VDOM带来了什么" class="headerlink" title="三、VDOM带来了什么"></a>三、VDOM带来了什么</h3><p>DOM是我们已经可以看得到的。如果需要检索一遍list，找出需要修改的Element，我们需要记录旧的信息，再通过新的信息和旧的信息去比较得到我们想要修改的Element。显然，我们不能直接记录旧的DOM，毫无意义，DOM是能实时给用户看的。我们需要另一个东西来还原出DOM的结构，通过新的NodeTree和旧的NodeTree之间的比较，来找出我们需要修改的Element，然后再进行patch。</p>
+<p>这时候就有VDOM(virtualDOM)，虚拟的DOM节点，不是真实的DOM，反正怎么搞用户也看不到。</p>
+<p>VDOM的结构和DOM基本一致，只是属性和方法不一样，VDOM只记录重要的信息，比如tag，props，children。而DOM里面就不止了，有一大堆方法。VDOM是DOM的精简版。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  type: <span class="string">"div"</span>,</span><br><span class="line">  props: &#123;</span><br><span class="line">    <span class="string">"id"</span>: <span class="string">"foo"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  children: [<span class="string">"Hello!"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就可以还原出这个NodeTree</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> element = <span class="built_in">document</span>.createElement(<span class="string">'div'</span>)</span><br><span class="line">element.setAttribute(<span class="string">'id'</span>, <span class="string">'foo'</span>);</span><br><span class="line"><span class="keyword">var</span> child = <span class="built_in">document</span>.createTextNode(<span class="string">'Hello!'</span>)</span><br><span class="line">element.appendChild(child)</span><br><span class="line"><span class="comment">// &lt;div id="foo"&gt;Hello!&lt;/div&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="React的jsx"><a href="#React的jsx" class="headerlink" title="React的jsx"></a>React的jsx</h2><h3 id="一、jsx是什么"><a href="#一、jsx是什么" class="headerlink" title="一、jsx是什么"></a>一、jsx是什么</h3><p>在我 看来jsx就是个语法糖，让我们在js中写类html用的。方便开发。babel或者typescript都支持对jsx的编译。</p>
+<p><strong>Before:</strong></p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** <span class="doctag">@jsx </span>h */</span></span><br><span class="line"><span class="keyword">let</span> foo = (<span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">p</span> /&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">span</span>&gt;</span>123<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">ul</span> /&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/"</span> /&gt;</span></span></span><br><span class="line"><span class="xml">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>);</span><br></pre></td></tr></table></figure>
+<p><strong>After:</strong> </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo = h(</span><br><span class="line">	<span class="string">'div'</span>,</span><br><span class="line">	<span class="literal">null</span>,</span><br><span class="line">	h(<span class="string">'p'</span>, <span class="literal">null</span>),</span><br><span class="line">	h(</span><br><span class="line">		<span class="string">'span'</span>,</span><br><span class="line">		<span class="literal">null</span>,</span><br><span class="line">		<span class="string">'123'</span></span><br><span class="line">	),</span><br><span class="line">	h(<span class="string">'ul'</span>, <span class="literal">null</span>),</span><br><span class="line">	h(<span class="string">'a'</span>, &#123; <span class="attr">href</span>: <span class="string">'/'</span> &#125;)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/dominictarr/hyperscript" target="_blank" rel="noopener">hyperscript</a></p>
+<h3 id="二、jsx与VDOM"><a href="#二、jsx与VDOM" class="headerlink" title="二、jsx与VDOM"></a>二、jsx与VDOM</h3><p>我们可以通过定义h函数，来得到一个VDOMtree，通过diff 新的VDOMtree和旧的VDOMtree来得到需要patch的Element，然后update到DOM上，来修改视图。</p>
+<h2 id="VDOM的关键部分"><a href="#VDOM的关键部分" class="headerlink" title="VDOM的关键部分"></a>VDOM的关键部分</h2><h3 id="一、VDOMTree"><a href="#一、VDOMTree" class="headerlink" title="一、VDOMTree"></a>一、VDOMTree</h3><p>我们通过定义<strong>hyperscript</strong>函数，通过他的返回值，来得到一个VDOMtree</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">h</span>(<span class="params"><span class="keyword">type</span>: <span class="built_in">string</span>, props: props, ...children: <span class="built_in">Array</span>&lt;VNode&gt;</span>): <span class="title">VNode</span> </span>&#123;</span><br><span class="line">  props = props || &#123;&#125;</span><br><span class="line">  <span class="keyword">const</span> key = props.key</span><br><span class="line">  children = flatten(children).map(<span class="function"><span class="params">item</span> =&gt;</span> (isText(item) ? &#123; <span class="keyword">type</span>: <span class="string">'text'</span>, props: &#123;&#125;, key, children: [], text: item, el: <span class="literal">undefined</span> &#125; : item))</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    <span class="keyword">type</span>,</span><br><span class="line">    props,</span><br><span class="line">    children: children,</span><br><span class="line">    key,</span><br><span class="line">    el: <span class="literal">undefined</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Before:</strong></p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** <span class="doctag">@jsx </span>h */</span></span><br><span class="line"><span class="keyword">let</span> foo = (<span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">p</span> /&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">span</span>&gt;</span>123<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">ul</span> /&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/"</span> /&gt;</span></span></span><br><span class="line"><span class="xml">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>);</span><br></pre></td></tr></table></figure>
+<p><strong>After:</strong> </p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"type"</span>:<span class="string">"div"</span>,</span><br><span class="line">  <span class="attr">"props"</span>:&#123;&#125;,</span><br><span class="line">  <span class="attr">"children"</span>:[</span><br><span class="line">    &#123;<span class="attr">"type"</span>:<span class="string">"p"</span>,<span class="attr">"props"</span>:&#123;&#125;,<span class="attr">"children"</span>:[]&#125;,</span><br><span class="line">    &#123;<span class="attr">"type"</span>:<span class="string">"span"</span>,<span class="attr">"props"</span>:&#123;&#125;,<span class="attr">"children"</span>:[</span><br><span class="line">      &#123;<span class="attr">"type"</span>:<span class="string">"text"</span>,<span class="attr">"props"</span>:&#123;&#125;,<span class="attr">"children"</span>:[],<span class="attr">"text"</span>:<span class="string">"123"</span>&#125;]&#125;,</span><br><span class="line">    &#123;<span class="attr">"type"</span>:<span class="string">"ul"</span>,<span class="attr">"props"</span>:&#123;&#125;,<span class="attr">"children"</span>:[]&#125;,</span><br><span class="line">    &#123;<span class="attr">"type"</span>:<span class="string">"a"</span>,<span class="attr">"props"</span>:&#123;<span class="attr">"href"</span>:<span class="string">"/"</span>&#125;,<span class="attr">"children"</span>:[]&#125;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样我们就可以得到一个VDOMtree了。</p>
+<h3 id="二、createNode-VDOM-gt-DOM"><a href="#二、createNode-VDOM-gt-DOM" class="headerlink" title="二、createNode(VDOM-&gt;DOM)"></a>二、createNode(VDOM-&gt;DOM)</h3><h4 id="1-dfs的创建过程"><a href="#1-dfs的创建过程" class="headerlink" title="1.dfs的创建过程"></a>1.dfs的创建过程</h4><p><img src="dfs.png" alt></p>
+<p>图片上的是一棵树，Node的创建过程如树边上的序号所示。</p>
+<p>代码如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createElm</span>(<span class="params">vnode: VNode</span>): <span class="title">Node</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (vnode.type === <span class="string">'text'</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> el = <span class="built_in">document</span>.createTextNode(vnode.text)</span><br><span class="line">    vnode.el = el</span><br><span class="line">    <span class="keyword">return</span> el</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> el = <span class="built_in">document</span>.createElement(vnode.type)</span><br><span class="line">  setProps(el, vnode.props)</span><br><span class="line">  vnode.el = el</span><br><span class="line">  vnode.children.map(createElm).forEach(<span class="function"><span class="params">child</span> =&gt;</span> el.appendChild(child))</span><br><span class="line">  <span class="keyword">return</span> el</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建完element后，需要把实际DOM中的element存放在VDOMNode中的el属性中，方便后续对element进行操作。</p>
+<h4 id="2-添加node的props"><a href="#2-添加node的props" class="headerlink" title="2.添加node的props"></a>2.添加node的props</h4><p>创建的过程中对每个Node需要添加props。target的为HTMLElement因为Element才有setAttribute方法，Node是没有的，例如（textNode）</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setProp</span>(<span class="params">target: HTMLElement, attr: <span class="built_in">string</span>, value: <span class="built_in">any</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (attr === <span class="string">'className'</span>) attr = <span class="string">'class'</span></span><br><span class="line">  <span class="keyword">if</span> (attr === <span class="string">'onClick'</span>) &#123;</span><br><span class="line">    target.addEventListener(<span class="string">'click'</span>, value)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  target.setAttribute(attr, value)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setProps</span>(<span class="params">target: HTMLElement, props: object</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">Object</span>.keys(props).map(<span class="function"><span class="params">key</span> =&gt;</span> setProp(target, key, props[key]))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3-flatten-Array的用处"><a href="#3-flatten-Array的用处" class="headerlink" title="3.flatten Array的用处"></a>3.flatten Array的用处</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">h</span>(<span class="params"><span class="keyword">type</span>: <span class="built_in">string</span>, props: props, ...children: <span class="built_in">Array</span>&lt;VNode&gt;</span>): <span class="title">VNode</span> </span>&#123;</span><br><span class="line">  props = props || &#123;&#125;</span><br><span class="line">  <span class="keyword">const</span> key = props.key</span><br><span class="line">  children = flatten(children).map(<span class="function"><span class="params">item</span> =&gt;</span> (isText(item) ? &#123; <span class="keyword">type</span>: <span class="string">'text'</span>, props: &#123;&#125;, key, children: [], text: item, el: <span class="literal">undefined</span> &#125; : item))</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    <span class="keyword">type</span>,</span><br><span class="line">    props,</span><br><span class="line">    children: children,</span><br><span class="line">    key,</span><br><span class="line">    el: <span class="literal">undefined</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码上children需要flatten，flatten函数的作用是将二维数组变成一维的。</p>
+<p>JSX：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">    &#123;[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].map(<span class="function"><span class="params">item</span> =&gt;</span> <span class="xml"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;item&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span>)&#125;</span><br><span class="line">    &lt;p&gt;<span class="number">5</span>&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">  &lt;/</span>div&gt;</span><br></pre></td></tr></table></figure>
+<p><strong>UnFlatten:</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"type"</span>: <span class="string">"div"</span>, </span><br><span class="line">    <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">    <span class="attr">"children"</span>: [</span><br><span class="line">        [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"type"</span>: <span class="string">"p"</span>, </span><br><span class="line">                <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                <span class="attr">"children"</span>: [</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="attr">"type"</span>: <span class="string">"text"</span>, </span><br><span class="line">                        <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                        <span class="attr">"children"</span>: [ ], </span><br><span class="line">                        <span class="attr">"text"</span>: <span class="number">1</span></span><br><span class="line">                    &#125;</span><br><span class="line">                ]</span><br><span class="line">            &#125;, </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"type"</span>: <span class="string">"p"</span>, </span><br><span class="line">                <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                <span class="attr">"children"</span>: [</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="attr">"type"</span>: <span class="string">"text"</span>, </span><br><span class="line">                        <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                        <span class="attr">"children"</span>: [ ], </span><br><span class="line">                        <span class="attr">"text"</span>: <span class="number">2</span></span><br><span class="line">                    &#125;</span><br><span class="line">                ]</span><br><span class="line">            &#125;, </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"type"</span>: <span class="string">"p"</span>, </span><br><span class="line">                <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                <span class="attr">"children"</span>: [</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="attr">"type"</span>: <span class="string">"text"</span>, </span><br><span class="line">                        <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                        <span class="attr">"children"</span>: [ ], </span><br><span class="line">                        <span class="attr">"text"</span>: <span class="number">3</span></span><br><span class="line">                    &#125;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        ], </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"p"</span>, </span><br><span class="line">            <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">            <span class="attr">"children"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"type"</span>: <span class="string">"text"</span>, </span><br><span class="line">                    <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                    <span class="attr">"children"</span>: [ ], </span><br><span class="line">                    <span class="attr">"text"</span>: <span class="string">"5"</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Flatten:</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"type"</span>: <span class="string">"div"</span>, </span><br><span class="line">    <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">    <span class="attr">"children"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"p"</span>, </span><br><span class="line">            <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">            <span class="attr">"children"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"type"</span>: <span class="string">"text"</span>, </span><br><span class="line">                    <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                    <span class="attr">"children"</span>: [ ], </span><br><span class="line">                    <span class="attr">"text"</span>: <span class="number">1</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"p"</span>, </span><br><span class="line">            <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">            <span class="attr">"children"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"type"</span>: <span class="string">"text"</span>, </span><br><span class="line">                    <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                    <span class="attr">"children"</span>: [ ], </span><br><span class="line">                    <span class="attr">"text"</span>: <span class="number">2</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"p"</span>, </span><br><span class="line">            <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">            <span class="attr">"children"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"type"</span>: <span class="string">"text"</span>, </span><br><span class="line">                    <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                    <span class="attr">"children"</span>: [ ], </span><br><span class="line">                    <span class="attr">"text"</span>: <span class="number">3</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"p"</span>, </span><br><span class="line">            <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">            <span class="attr">"children"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"type"</span>: <span class="string">"text"</span>, </span><br><span class="line">                    <span class="attr">"props"</span>: &#123; &#125;, </span><br><span class="line">                    <span class="attr">"children"</span>: [ ], </span><br><span class="line">                    <span class="attr">"text"</span>: <span class="string">"5"</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>会发现，在flatten之前，div的children其实是[[1, 2, 3], 5]， flatten之后是[1, 2, 3, 5]。</p>
+<p>因为map的返回值是一个数组，所以就会得到[[1, 2, 3], 5]这样的结果。</p>
+<h3 id="三、diffChildrenNodes"><a href="#三、diffChildrenNodes" class="headerlink" title="三、diffChildrenNodes"></a>三、diffChildrenNodes</h3><h4 id="1-Diff算法"><a href="#1-Diff算法" class="headerlink" title="1.Diff算法"></a>1.Diff算法</h4><p>diff是通过一层一层来diff的，类似与bfs的过程，都是先拓展出所有子节点。</p>
+<p>首先先来看一下2段关键代码</p>
+<p><strong>PatchChildren</strong></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">patchChildren</span>(<span class="params">newCh: <span class="built_in">Array</span>&lt;VNode&gt;, oldCh: <span class="built_in">Array</span>&lt;VNode&gt;, parentElm: Node</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> oldStartIdx = <span class="number">0</span></span><br><span class="line">  <span class="keyword">let</span> newStartIdx = <span class="number">0</span></span><br><span class="line">  <span class="keyword">let</span> oldEndIdx = oldCh.length - <span class="number">1</span></span><br><span class="line">  <span class="keyword">let</span> newEndIdx = newCh.length - <span class="number">1</span></span><br><span class="line">  <span class="keyword">let</span> oldStartNode = oldCh[<span class="number">0</span>]</span><br><span class="line">  <span class="keyword">let</span> newStartNode = newCh[<span class="number">0</span>]</span><br><span class="line">  <span class="keyword">let</span> oldEndNode = oldCh[oldEndIdx]</span><br><span class="line">  <span class="keyword">let</span> newEndNode = newCh[newEndIdx]</span><br><span class="line">  <span class="keyword">let</span> oldKeyToIdx, idxInOld</span><br><span class="line">  <span class="keyword">while</span> (oldStartIdx &lt;= oldEndIdx &amp;&amp; newStartIdx &lt;= newEndIdx) &#123;</span><br><span class="line">    <span class="keyword">if</span> (isUndef(oldStartNode)) &#123;</span><br><span class="line">      oldStartNode = oldCh[++oldStartIdx] <span class="comment">//oldNode已经被移动</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isUndef(oldEndNode)) &#123;</span><br><span class="line">      oldEndNode = oldCh[--oldEndIdx] <span class="comment">//oldNode已经被移动</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sameVnode(newStartNode, oldStartNode)) &#123;</span><br><span class="line">      <span class="comment">// startNode 相似 不需要移动</span></span><br><span class="line">      patchNode(newStartNode, oldStartNode)</span><br><span class="line">      newStartNode = newCh[++newStartIdx]</span><br><span class="line">      oldStartNode = oldCh[++oldStartIdx]</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sameVnode(newEndNode, oldEndNode)) &#123;</span><br><span class="line">      <span class="comment">// endNode 相似 不需要移动</span></span><br><span class="line">      patchNode(newEndNode, oldEndNode)</span><br><span class="line">      newEndNode = newCh[--newEndIdx]</span><br><span class="line">      oldEndNode = oldCh[--oldEndIdx]</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sameVnode(newStartNode, oldEndNode)) &#123;</span><br><span class="line">      patchNode(newStartNode, oldEndNode) <span class="comment">//先把子树patch再移动</span></span><br><span class="line">      parentElm.insertBefore(oldEndNode.el, oldStartNode.el)</span><br><span class="line">      newStartNode = newCh[++newStartIdx]</span><br><span class="line">      oldEndNode = oldCh[--oldEndIdx]</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (sameVnode(newEndNode, oldStartNode)) &#123;</span><br><span class="line">      patchNode(newEndNode, oldStartNode)</span><br><span class="line">      parentElm.insertBefore(oldStartNode.el, oldEndNode.el.nextSibling)</span><br><span class="line">      newEndNode = newCh[--newEndIdx]</span><br><span class="line">      oldStartNode = oldCh[++oldStartIdx]</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (isUndef(oldKeyToIdx)) oldKeyToIdx = createKeyToOldCh(oldCh, oldStartIdx, oldEndIdx)</span><br><span class="line">      idxInOld = isDef(newStartNode.key) ? oldKeyToIdx[newStartNode.key] : findIdxInOld(newStartNode, oldCh, oldStartIdx, oldEndIdx)</span><br><span class="line">      <span class="keyword">if</span> (isUndef(idxInOld)) &#123;</span><br><span class="line">        <span class="comment">// node 不存在，创建</span></span><br><span class="line">        <span class="keyword">const</span> el = createElm(newStartNode)</span><br><span class="line">        insert(parentElm, el, oldStartNode.el)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> vnodeToMove = oldCh[idxInOld]</span><br><span class="line">        <span class="keyword">if</span> (sameVnode(newStartNode, vnodeToMove)) &#123;</span><br><span class="line">          patchNode(newStartNode, vnodeToMove)</span><br><span class="line">          oldCh[idxInOld] = <span class="literal">undefined</span> <span class="comment">//移动后删除</span></span><br><span class="line">          parentElm.insertBefore(vnodeToMove.el, oldStartNode.el)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">// key相同但是不同element</span></span><br><span class="line">          <span class="keyword">const</span> el = createElm(newStartNode)</span><br><span class="line">          insert(parentElm, el, oldStartNode.el)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      newStartNode = newCh[++newStartIdx]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (oldStartIdx &gt; oldEndIdx) &#123;</span><br><span class="line">    <span class="comment">// oldNode 列表扫描完，还没添加完</span></span><br><span class="line">    <span class="keyword">const</span> refElm = isUndef(newCh[newEndIdx + <span class="number">1</span>]) ? <span class="literal">null</span> : newCh[newEndIdx + <span class="number">1</span>].el</span><br><span class="line">    <span class="comment">// newCh[newEndIdx].el.nextSibling</span></span><br><span class="line">    addVNodes(parentElm, refElm, newCh, newStartIdx, newEndIdx)</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (newStartIdx &gt; newEndIdx) &#123;</span><br><span class="line">    removeNodes(oldCh, oldStartIdx, oldEndIdx)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>PatchNode</strong></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">patchNode</span>(<span class="params">newVNode: VNode, oldVNode: VNode</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> elm = (newVNode.el = oldVNode.el)</span><br><span class="line">  <span class="keyword">const</span> oldCh = oldVNode.children</span><br><span class="line">  <span class="keyword">const</span> newCh = newVNode.children</span><br><span class="line">  <span class="keyword">if</span> (newVNode.type !== <span class="string">'text'</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (isDef(oldCh) &amp;&amp; isDef(newCh)) &#123;</span><br><span class="line">      patchChildren(newCh, oldCh, elm)</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isDef(newCh)) &#123;</span><br><span class="line">      <span class="keyword">if</span> (oldVNode.type === <span class="string">'text'</span>) elm.textContent = <span class="string">''</span> <span class="comment">// 清空node的text</span></span><br><span class="line">      addVNodes(elm, <span class="literal">null</span>, newCh, <span class="number">0</span>, newCh.length - <span class="number">1</span>)</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isDef(oldCh)) &#123;</span><br><span class="line">      <span class="comment">// 新node的children为空,移除子节点</span></span><br><span class="line">      removeNodes(oldCh, <span class="number">0</span>, oldCh.length - <span class="number">1</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (newVNode.type === <span class="string">'text'</span> &amp;&amp; oldVNode.type === <span class="string">'text'</span>) &#123;</span><br><span class="line">    <span class="comment">// 文本节点</span></span><br><span class="line">    <span class="keyword">if</span> (newVNode.text === oldVNode.text) <span class="keyword">return</span></span><br><span class="line">    elm.textContent = newVNode.text</span><br><span class="line">  &#125;</span><br><span class="line">  patchProps(newVNode, oldVNode)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码中都有注释。那么来看一个实例：根节点是samenode的情况。</p>
+<p><strong>OldNodes</strong></p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">    &lt;p&gt;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">    &lt;span&gt;Hello!&lt;/</span>span&gt;</span><br><span class="line">    &lt;ul&gt;</span><br><span class="line">      &lt;li key=<span class="string">"1"</span>&gt;<span class="number">1</span>&lt;<span class="regexp">/li&gt;</span></span><br><span class="line"><span class="regexp">      &lt;li key="2"&gt;2&lt;/</span>li&gt;</span><br><span class="line">    &lt;<span class="regexp">/ul&gt;</span></span><br><span class="line"><span class="regexp">    &lt;a href=""&gt;&lt;/</span>a&gt;</span><br><span class="line">  &lt;<span class="regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>NewNodes</strong></p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">  &lt;p&gt;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">  &lt;ul&gt;</span></span><br><span class="line"><span class="regexp">    &lt;li key="4"&gt;4&lt;/</span>li&gt;</span><br><span class="line">    &lt;li key=<span class="string">"1"</span>&gt;<span class="number">1</span>&lt;<span class="regexp">/li&gt;</span></span><br><span class="line"><span class="regexp">    &lt;li key="3"&gt;3&lt;/</span>li&gt;</span><br><span class="line">  &lt;<span class="regexp">/ul&gt;</span></span><br><span class="line"><span class="regexp">  &lt;span&gt;Hello!&lt;/</span>span&gt;</span><br><span class="line">&lt;<span class="regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这2个的VDOM树如图：</p>
+<p><img src="diff-1.png" alt="img"></p>
+<p>首先，这2个VDOM都会生成一棵VDOMTree都有一个root节点，都是div，我们调用patchNode(newNode, oldNode)来调整DOM</p>
+<p><img src="diff-2.png" alt></p>
+<p>因为根节点是sameNode(标签相同且key相同//没有key)，并且都有children，就需要patchChildren</p>
+<p>如图上橙色的，就是需要diff的子节点。Olds[p, span, ul, a], News[p, ul, span]</p>
+<p><img src="diff-3.png" alt></p>
+<p><code>newStart: p</code> <code>oldStart: p</code> 并且<code>sameNode(newStart, oldStart): true</code> 所以<code>patch(newStart, oldStart)</code> 在这一层中相对位置不需要变动。</p>
+<p><code>newStart: ul</code> <code>oldStart: span</code> , <code>newEnd: span</code>,<code>oldEnd: a</code>  <code>sameNode(newEnd, oldStart): true</code> 所以先将整个子树patch<code>patch(newEnd, oldStart)</code> 这时候需要在DOM中将 以oldStart为根的整棵子树移动到结尾， 如图。</p>
+<p><img src="diff-2-2.png" alt></p>
+<p>将patch后的子树，移动到末尾，原来的子树会被删除，也就是说：insertBefore的操作是移动的。</p>
+<p><code>newStart: ul</code> <code>oldStart: ul</code> 所以不需要移动，但是他的子节点可能需要patch，所以：patchNode的时候需要patchChildren</p>
+<p><img src="diff-5.png" alt></p>
+<p><img src="diff-6.png" alt></p>
+<p>key为4的element不存在，所以需要创建。</p>
+<p>就循环patchNode, patchChildren……….</p>
+<p>这里有一个要注意的地方，有一段代码：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">findIdxInOld(newStartNode, oldCh, oldStartIdx, oldEndIdx)</span><br><span class="line"><span class="comment">// 在没有Key的时候，他是需要循环去查找这个sameNode</span></span><br><span class="line"><span class="comment">// 会有疑问，这样时间复杂度不是会降到O(n^2)但是为什么还要这样做？</span></span><br><span class="line"><span class="comment">// 我的理解是，有可能存在sameNode，但是没有这样去查找，就可能需要删除整个子树，然后重建。那如果这棵子树的深度很深，，也就是说，他还有儿子节点，孙子节点balabala一大堆后代节点，重建显然是不划算的。</span></span><br><span class="line"><span class="comment">// 在这里，大概就能知道为什么需要给循环出来的组件加key了。</span></span><br></pre></td></tr></table></figure>
+<p>#### </p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>通过这个VDOM，了解了vue的diff算法，这个算法让我学习到了工程中的算法和ACM写的算法的差异。ACM求的都是最优解，但是工程中的算法需要考虑很多实际情况。</p>
+<p>加key能提高VDOM的性能，并且key尽量不用index，应该使用一些更独特的信息。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Document_Object_Model/Introduction" target="_blank" rel="noopener">1.DOM概述</a></p>
+<p><a href="https://stackoverflow.com/questions/9979172/difference-between-node-object-and-element-object" target="_blank" rel="noopener">2.Difference between Node object and Element object?</a></p>
+<p><a href="https://jasonformat.com/wtf-is-jsx/" target="_blank" rel="noopener">3.WTF is JSX</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/Vue-js/" rel="tag"># Vue.js</a>
+          
+            <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/30/LeetCode Weekly Contest 56 /" rel="next" title="LeetCode Weekly Contest 56">
+                <i class="fa fa-chevron-left"></i> LeetCode Weekly Contest 56
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/11/Inheritance-and-the-prototype-chain/" rel="prev" title="继承和原型链">
+                继承和原型链 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Chs97">
+          <p class="site-author-name" itemprop="name">Chs97</p>
+           
+              <p class="site-description motion-element" itemprop="description">Just do it.</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#VDOM"><span class="nav-number">1.</span> <span class="nav-text">VDOM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要有VDOM"><span class="nav-number">1.1.</span> <span class="nav-text">为什么要有VDOM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、DOM-Document-Object-Model"><span class="nav-number">1.1.1.</span> <span class="nav-text">一、DOM(Document Object Model)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Node和Element"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">Node和Element</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、没有VDOM"><span class="nav-number">1.1.2.</span> <span class="nav-text">二、没有VDOM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、VDOM带来了什么"><span class="nav-number">1.1.3.</span> <span class="nav-text">三、VDOM带来了什么</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#React的jsx"><span class="nav-number">1.2.</span> <span class="nav-text">React的jsx</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、jsx是什么"><span class="nav-number">1.2.1.</span> <span class="nav-text">一、jsx是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、jsx与VDOM"><span class="nav-number">1.2.2.</span> <span class="nav-text">二、jsx与VDOM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VDOM的关键部分"><span class="nav-number">1.3.</span> <span class="nav-text">VDOM的关键部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、VDOMTree"><span class="nav-number">1.3.1.</span> <span class="nav-text">一、VDOMTree</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、createNode-VDOM-gt-DOM"><span class="nav-number">1.3.2.</span> <span class="nav-text">二、createNode(VDOM-&gt;DOM)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-dfs的创建过程"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">1.dfs的创建过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-添加node的props"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">2.添加node的props</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-flatten-Array的用处"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">3.flatten Array的用处</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、diffChildrenNodes"><span class="nav-number">1.3.3.</span> <span class="nav-text">三、diffChildrenNodes</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Diff算法"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">1.Diff算法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后"><span class="nav-number">1.4.</span> <span class="nav-text">最后</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">1.5.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chs97</span>
+  <a href="http://beian.miit.gov.cn">闽ICP备16001018号-1</a> 
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

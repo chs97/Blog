@@ -1,0 +1,749 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="微信小程序,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="微信小程序 爬坑记录 request-header Labrador 组件 封装了 小程序原版的 request。 源码：">
+<meta name="keywords" content="微信小程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微信小程序request headers">
+<meta property="og:url" content="http://www.hs97.cn/2017/01/29/wechatHeader/index.html">
+<meta property="og:site_name" content="Chs97&#39;s Blog">
+<meta property="og:description" content="微信小程序 爬坑记录 request-header Labrador 组件 封装了 小程序原版的 request。 源码：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://od690gqhu.bkt.clouddn.com/2017129163652.png">
+<meta property="og:updated_time" content="2020-03-10T03:55:08.551Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="微信小程序request headers">
+<meta name="twitter:description" content="微信小程序 爬坑记录 request-header Labrador 组件 封装了 小程序原版的 request。 源码：">
+<meta name="twitter:image" content="http://od690gqhu.bkt.clouddn.com/2017129163652.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.hs97.cn/2017/01/29/wechatHeader/">
+
+
+
+
+
+  <title>微信小程序request headers | Chs97's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Chs97's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-algorithm">
+          <a href="/categories/Algorithm" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-comments-o"></i> <br>
+            
+            算法
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.hs97.cn/2017/01/29/wechatHeader/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chs97">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chs97's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                微信小程序request headers
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-29T16:46:00+00:00">
+                2017-01-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="微信小程序-爬坑记录-request-header"><a href="#微信小程序-爬坑记录-request-header" class="headerlink" title="微信小程序 爬坑记录 request-header"></a>微信小程序 爬坑记录 request-header</h2><hr>
+<p>Labrador 组件 封装了 小程序原版的 request。</p>
+<p>源码：</p>
+<a id="more"></a>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@copyright </span>Maichong Software Ltd. 2016 http://maichong.it</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date </span>2016-11-19</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author </span>Liang &lt;liang<span class="doctag">@maichong</span>.it&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> wx <span class="keyword">from</span> <span class="string">'labrador'</span></span><br><span class="line"><span class="keyword">import</span> stringify <span class="keyword">from</span> <span class="string">'qs/lib/stringify'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 默认获取SessionID方法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns <span class="type">&#123;string&#125;</span></span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">defaultGetSession</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> wx.app.sessionId</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 默认设置SessionID方法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param <span class="type">&#123;string&#125;</span> <span class="variable">sessionId</span></span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">defaultSetSession</span>(<span class="params">sessionId</span>) </span>&#123;</span><br><span class="line">  wx.app.sessionId = sessionId</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 有效HTTP方法列表</span></span><br><span class="line"><span class="keyword">const</span> methods = [<span class="string">'GET'</span>, <span class="string">'POST'</span>, <span class="string">'PUT'</span>, <span class="string">'DELETE'</span>, <span class="string">'OPTIONS'</span>, <span class="string">'HEAD'</span>, <span class="string">'TRACE'</span>, <span class="string">'CONNECT'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 创建API Request客户端</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param <span class="type">&#123;Object&#125;</span> </span>options 选项</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns <span class="type">&#123;Function&#125;</span></span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">create</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">  options = options || &#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 通用Alaska RESTFUL风格API请求,如果alaska接口返回错误,则抛出异常</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param <span class="type">&#123;string&#125;</span> </span>[method] 请求方法,可选默认GET,有效值：OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param <span class="type">&#123;string&#125;</span> </span>apiName  API名称,必选</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param <span class="type">&#123;object&#125;</span> </span>[data]   数据,可选,如果方法为GET或DELETE,则此对象中的所有数据将传入URL query</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@param <span class="type">&#123;object&#125;</span> </span>[header] HTTP头对象,可选</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@returns <span class="type">&#123;*&#125;</span></span></span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">request</span>(<span class="params">method, apiName, data, header</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> apiRoot = options.apiRoot || &#123;&#125;</span><br><span class="line">    <span class="keyword">const</span> updateKey = options.updateKey || <span class="string">'_session'</span></span><br><span class="line">    <span class="keyword">const</span> headerKey = options.headerKey || <span class="string">'Session'</span></span><br><span class="line">    <span class="keyword">const</span> getSession = options.getSession || defaultGetSession</span><br><span class="line">    <span class="keyword">const</span> setSession = options.setSession || defaultSetSession</span><br><span class="line">    <span class="keyword">const</span> defaultHeader = options.defaultHeader</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (methods.indexOf(method) === <span class="number">-1</span>) &#123;</span><br><span class="line">      header = data</span><br><span class="line">      data = apiName</span><br><span class="line">      apiName = method</span><br><span class="line">      method = <span class="string">'GET'</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> url = apiRoot + apiName</span><br><span class="line">    <span class="comment">// 对非POST 和 PUT 的data进行处理</span></span><br><span class="line">    <span class="keyword">if</span> ([<span class="string">'POST'</span>, <span class="string">'PUT'</span>].indexOf(method) === <span class="number">-1</span> &amp;&amp; data) &#123;</span><br><span class="line">      <span class="keyword">let</span> querystring = stringify(data)</span><br><span class="line">      <span class="keyword">if</span> (url.indexOf(<span class="string">'?'</span>) &gt; <span class="number">-1</span>) &#123;</span><br><span class="line">        url += <span class="string">'&amp;'</span> + querystring</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        url += <span class="string">'?'</span> + querystring</span><br><span class="line">      &#125;</span><br><span class="line">      data = <span class="literal">undefined</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置默认header</span></span><br><span class="line">    header = <span class="built_in">Object</span>.assign(&#123;&#125;, defaultHeader, header)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (options.session !== <span class="literal">false</span>) &#123;</span><br><span class="line">      <span class="keyword">let</span> sessionId = getSession()</span><br><span class="line">      <span class="keyword">if</span> (sessionId) &#123;</span><br><span class="line">        header[headerKey] = sessionId</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 调用微信的wx.request</span></span><br><span class="line">    <span class="keyword">let</span> res = <span class="keyword">await</span> wx.request(&#123;</span><br><span class="line">      method,</span><br><span class="line">      url,</span><br><span class="line">      data,</span><br><span class="line">      header</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (options.session !== <span class="literal">false</span> &amp;&amp; res.data &amp;&amp; res.data[updateKey]) &#123;</span><br><span class="line">      <span class="keyword">if</span> (res.data &amp;&amp; res.data[updateKey]) &#123;</span><br><span class="line">        setSession(res.data[updateKey])</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (res.data &amp;&amp; res.data.error) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(res.data.error)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> res.data</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  methods.forEach(<span class="function"><span class="params">method</span> =&gt;</span> &#123;</span><br><span class="line">    request[method.toLowerCase()] = <span class="function"><span class="keyword">function</span>(<span class="params">...args</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> request(method, ...args)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  request.setOptions = <span class="function"><span class="keyword">function</span>(<span class="params">newOptions</span>) </span>&#123;</span><br><span class="line">    options = newOptions || &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> request</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 导出默认API客户端</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> create(&#123;</span><br><span class="line">  apiRoot: <span class="keyword">typeof</span> API_ROOT === <span class="string">'undefined'</span> ? <span class="string">''</span> : API_ROOT</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>接下来就是一个大坑：</p>
+<p>朋神写了一个 demo 给我。</p>
+<p><img src="http://od690gqhu.bkt.clouddn.com/2017129163652.png" alt></p>
+<p>需要 set header</p>
+<p>源码里面的 API 是这样的 request(menthod, url, data, header);</p>
+<p>然后我试了一下。没有报错。。network 也没有显示发送任何东西。第一感觉是 API 有问题</p>
+<p>尝试 request.post(url, data, header)一样</p>
+<p>request.setOptions({defaultHeader}) 也一样</p>
+<p>但是朋神说他 demo 测试没问题。。</p>
+<p>然后尝试着把 header 删掉。。可以发送请求，加上 header 就不行。</p>
+<p>尝试把 header 的数据全部换成 ‘1’ 也可以</p>
+<p>得出结论 是 header 的问题</p>
+<p>然后删掉 header 有一部分很长的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let res = yield wx.login();</span><br><span class="line">let data = yield wx.getUserInfo();</span><br><span class="line">let Header = &#123;</span><br><span class="line">  &apos;X-Wechat-Code&apos;: res.code,</span><br><span class="line">  &apos;X-Wechat-Data&apos;: data.rawData,</span><br><span class="line">  &apos;X-Wechat-Signature&apos;: data.signature</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>即 data.rawData</p>
+<p>正常可以发送请求，加上就不行。。</p>
+<p>那就是这个的锅了。截图给朋神看，朋神说 加个 encodeURIComponent 试试。。成功发送请求。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let res = yield wx.login();</span><br><span class="line">let data = yield wx.getUserInfo();</span><br><span class="line">let Header = &#123;</span><br><span class="line">  &apos;X-Wechat-Code&apos;: res.code,</span><br><span class="line">  &apos;X-Wechat-Data&apos;: encodeURIComponent(data.rawData),</span><br><span class="line">  &apos;X-Wechat-Signature&apos;: data.signature</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>总结：header 的这个字段有特殊字符和一些中文。所以要转义一下。。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/微信小程序/" rel="tag"># 微信小程序</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/14/Js-variable/" rel="next" title="JavaScript 变量作用域&变量提升">
+                <i class="fa fa-chevron-left"></i> JavaScript 变量作用域&变量提升
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/10/JSDeliver/" rel="prev" title="JavaScript 按值传递&&按引用传递">
+                JavaScript 按值传递&&按引用传递 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Chs97">
+          <p class="site-author-name" itemprop="name">Chs97</p>
+           
+              <p class="site-description motion-element" itemprop="description">Just do it.</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#微信小程序-爬坑记录-request-header"><span class="nav-number">1.</span> <span class="nav-text">微信小程序 爬坑记录 request-header</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chs97</span>
+  <a href="http://beian.miit.gov.cn">闽ICP备16001018号-1</a> 
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
